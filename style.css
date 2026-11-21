@@ -16,7 +16,10 @@ html, body { height: 100%; }
 body {
   font-family: "Patrick Hand", "Comic Sans MS", cursive;
   color: var(--ink);
-  background: #c8e6f8 url("design/cloudy-sky-tile.jpg") repeat 0 0 / 1000px auto;
+  background:
+    url("design/cloudy-sky-tile.jpg") repeat 0 0 / 1000px auto,
+    url("design/Charlie%20Brown%20Cloudy%20Sky.jpg") repeat 0 0 / 1000px auto,
+    #c8e6f8;
   animation: skydrift 90s linear infinite;
   overflow: hidden;
 }
@@ -128,7 +131,7 @@ body {
 
 /* ---------- Stage & envelope ---------- */
 .stage {
-  position: relative; z-index: 2; min-height: 100%;
+  position: relative; z-index: 2; min-height: 100vh; min-height: 100dvh;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
   padding: 20px; transition: opacity .5s ease, transform .5s ease;
 }
@@ -179,9 +182,9 @@ body {
 .card h1 { font-size: clamp(1.7rem, 7vw, 2.1rem); font-weight: 400; line-height: 1; }
 .choices { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 6px; min-height: 52px; }
 .env.rise .card { transform: translateY(-62%); }
-.env.out .card { transform: translateY(8%) scale(1.22); pointer-events: auto; box-shadow: 6px 6px 0 var(--ink); }
+.env.out .card { pointer-events: auto; box-shadow: 6px 6px 0 var(--ink); }
 .env.out .env-back, .env.out .env-front, .env.out .env-flap { opacity: 0; }
-.card.leave { transform: translateY(8%) scale(0) rotate(12deg) !important; opacity: 0; }
+.card.leave { transform: scale(0) rotate(12deg) !important; opacity: 0; }
 
 .nochoice {
   min-height: 1.2em; font-size: 1.15rem; color: #c0252f; line-height: 1;
