@@ -3,57 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1b1a3a">
-  <title>A letter bloomed for you</title>
+  <meta name="theme-color" content="#2f86e8">
+  <title>A letter for you</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Caveat:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Special+Elite&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Reusable sunflower drawing -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
-      <g id="sunflower">
-        <g fill="#f6b91c">
-          <ellipse cx="50" cy="14" rx="9" ry="20"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(30 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(60 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(90 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(120 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(150 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(180 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(210 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(240 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(270 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(300 50 50)"/>
-          <ellipse cx="50" cy="14" rx="9" ry="20" transform="rotate(330 50 50)"/>
-        </g>
-        <circle cx="50" cy="50" r="17" fill="#5a3418"/>
-        <circle cx="50" cy="50" r="10" fill="#7a4a24"/>
+      <g id="paw">
+        <ellipse cx="50" cy="66" rx="22" ry="18"/>
+        <ellipse cx="22" cy="42" rx="9" ry="12" transform="rotate(-20 22 42)"/>
+        <ellipse cx="40" cy="26" rx="9" ry="12" transform="rotate(-6 40 26)"/>
+        <ellipse cx="60" cy="26" rx="9" ry="12" transform="rotate(6 60 26)"/>
+        <ellipse cx="78" cy="42" rx="9" ry="12" transform="rotate(20 78 42)"/>
+      </g>
+      <g id="bone">
+        <path d="M14 22c-8-6-4-18 6-16 4 1 6 4 7 7h46c1-3 3-6 7-7 10-2 14 10 6 16 8 6 4 18-6 16-4-1-6-4-7-7H27c-1 3-3 6-7 7-10 2-14-10-6-16z" />
+      </g>
+      <g id="cloud">
+        <path d="M30 60c-16 0-24-18-8-26 2-16 26-22 38-10 10-12 34-6 36 12 18 0 22 24 4 24z"/>
       </g>
     </defs>
   </svg>
 
-  <div class="stars" aria-hidden="true"></div>
+  <!-- Drifting clouds -->
+  <div class="sky" aria-hidden="true">
+    <svg class="cloud c1" viewBox="0 0 140 80"><use href="#cloud"/></svg>
+    <svg class="cloud c2" viewBox="0 0 140 80"><use href="#cloud"/></svg>
+    <svg class="cloud c3" viewBox="0 0 140 80"><use href="#cloud"/></svg>
+  </div>
 
-  <!-- Field of sunflowers -->
-  <div class="field" aria-hidden="true">
-    <div class="stem s1"><svg viewBox="0 0 100 100"><use href="#sunflower"/></svg></div>
-    <div class="stem s2"><svg viewBox="0 0 100 100"><use href="#sunflower"/></svg></div>
-    <div class="stem s3"><svg viewBox="0 0 100 100"><use href="#sunflower"/></svg></div>
-    <div class="stem s4"><svg viewBox="0 0 100 100"><use href="#sunflower"/></svg></div>
-    <div class="stem s5"><svg viewBox="0 0 100 100"><use href="#sunflower"/></svg></div>
+  <!-- Hill, doghouse, paw trail -->
+  <div class="ground" aria-hidden="true">
+    <div class="hill"></div>
+    <svg class="doghouse" viewBox="0 0 200 170">
+      <path d="M20 80 L100 14 L180 80 Z" fill="#2f6fd1" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
+      <rect x="32" y="80" width="136" height="80" fill="#f1f8ff" stroke="#111" stroke-width="6"/>
+      <path d="M78 160 V112 a22 22 0 0 1 44 0 V160 Z" fill="#111"/>
+    </svg>
+    <svg class="paw p1" viewBox="0 0 100 100"><use href="#paw"/></svg>
+    <svg class="paw p2" viewBox="0 0 100 100"><use href="#paw"/></svg>
+    <svg class="paw p3" viewBox="0 0 100 100"><use href="#paw"/></svg>
+    <svg class="paw p4" viewBox="0 0 100 100"><use href="#paw"/></svg>
+    <svg class="bone b1" viewBox="0 0 100 44"><use href="#bone"/></svg>
+    <svg class="bone b2" viewBox="0 0 100 44"><use href="#bone"/></svg>
   </div>
 
   <!-- Step 1: enter the name -->
   <main class="cover" id="nameScreen">
-    <p class="small">Before we begin</p>
-    <h1 class="ask">Enter your name</h1>
-    <form class="name-form" id="nameForm" autocomplete="off">
+    <form class="panel" id="nameForm" autocomplete="off">
+      <p class="small">Hello, friend!</p>
+      <h1 class="ask">Enter your name</h1>
       <label class="sr" for="nameInput">Your name</label>
-      <input id="nameInput" type="text" maxlength="30" placeholder="Type your name" required>
+      <input id="nameInput" type="text" maxlength="30" placeholder="Type your name here" required>
       <p class="error" id="nameError" role="alert"></p>
       <button class="open-btn" type="submit">Continue</button>
     </form>
@@ -61,23 +67,42 @@
 
   <!-- Step 2: cover -->
   <main class="cover hide" id="cover" aria-hidden="true">
-    <p class="small">A letter for</p>
-    <h1 id="recipient">Someone special</h1>
+    <div class="panel">
+      <p class="small">A letter for</p>
+      <h1 id="recipient">Someone special</h1>
 
-    <button class="seal" id="seal" aria-label="Open the letter">
-      <svg viewBox="0 0 100 100"><use href="#sunflower"/></svg>
-    </button>
+      <button class="seal" id="seal" aria-label="Open the letter">
+        <svg viewBox="0 0 100 100"><use href="#paw"/></svg>
+      </button>
 
-    <p class="from" id="sender">with love</p>
-    <button class="open-btn" id="openBtn">Open the letter</button>
+      <p class="from" id="sender">with love</p>
+      <button class="open-btn" id="openBtn">Open the letter</button>
+    </div>
   </main>
 
   <!-- Letter -->
   <section class="letter-wrap" id="letterWrap" aria-hidden="true">
     <article class="letter" id="letter">
+      <!-- Big paw stamp in the corner -->
+      <svg class="paw-stamp" viewBox="0 0 100 100" aria-hidden="true"><use href="#paw"/></svg>
+
       <p class="to" id="letterTo"></p>
       <div class="body" id="letterBody"></div>
-      <p class="sign" id="letterSign"></p>
+
+      <div class="sign-row">
+        <svg class="paw-sign" viewBox="0 0 100 100" aria-hidden="true"><use href="#paw"/></svg>
+        <p class="sign" id="letterSign"></p>
+      </div>
+
+      <!-- Paw prints walking along the bottom -->
+      <div class="paw-trail" aria-hidden="true">
+        <svg viewBox="0 0 100 100"><use href="#paw"/></svg>
+        <svg viewBox="0 0 100 100"><use href="#paw"/></svg>
+        <svg viewBox="0 0 100 100"><use href="#paw"/></svg>
+        <svg viewBox="0 0 100 100"><use href="#paw"/></svg>
+        <svg viewBox="0 0 100 100"><use href="#paw"/></svg>
+      </div>
+
       <button class="close-btn" id="closeBtn">Fold it back</button>
     </article>
   </section>
