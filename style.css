@@ -184,6 +184,15 @@ body {
 .env.rise .card { transform: translateY(-62%); }
 .env.out .card { pointer-events: auto; box-shadow: 6px 6px 0 var(--ink); }
 .env.out .env-back, .env.out .env-front, .env.out .env-flap { opacity: 0; }
+
+/* stamp on the envelope */
+.env-stamp {
+  position: absolute; z-index: 5; right: 5%; bottom: 8%; width: 30%; height: auto;
+  transform: rotate(5deg); pointer-events: none;
+  filter: drop-shadow(2px 3px 0 rgba(17,17,17,.55));
+  transition: opacity .6s ease;
+}
+.env.out .env-stamp { opacity: 0; }
 .card.leave { transform: scale(0) rotate(12deg) !important; opacity: 0; }
 
 .nochoice {
