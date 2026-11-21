@@ -94,8 +94,32 @@ function openEnvelope() {
   env.classList.add("open");
   $("hint").classList.add("hide");
   setTimeout(() => env.classList.add("rise"), 450);
-  setTimeout(() => env.classList.add("out"), 1500);
+  setTimeout(() => { env.classList.add("out"); centerCard(); }, 1500);
 }
+
+// Lift the card out of the envelope and glide it to the exact middle of the window
+function centerCard() {
+  const r = card.getBoundingClientRect();
+  env.style.perspective = "none";              // so "fixed" is measured from the window
+  card.style.transition = "none";
+  card.style.position = "fixed";
+  card.style.left = r.left + "px";
+  card.style.top = r.top + "px";
+  card.style.width = r.width + "px";
+  card.style.height = r.height + "px";
+  card.style.transform = "none";
+  void card.offsetWidth;                       // apply the starting spot first
+  const ease = "cubic-bezier(.2,.9,.3,1.1)";
+  card.style.transition = "left .8s " + ease + ", top .8s " + ease + ", transform .8s " + ease + ", opacity .4s ease";
+  card.dataset.w = r.width; card.dataset.h = r.height;
+  placeCard();
+  card.style.transform = "scale(1.22)";
+}
+function placeCard() {
+  card.style.left = (window.innerWidth  - card.dataset.w) / 2 + "px";
+  card.style.top  = (window.innerHeight - card.dataset.h) / 2 + "px";
+}
+window.addEventListener("resize", () => { if (card.dataset.w) placeCard(); });
 $("envOpen").addEventListener("click", openEnvelope);
 
 /* ---------- 2) "No" disappears, "no choice ka" appears ---------- */
@@ -109,6 +133,35 @@ noBtn.addEventListener("click", () => {
 });
 
 /* ---------- helpers ---------- */
+// Split "HELL YEAHHH" into letters so they can pop in one by one
+(function () {
+  const h2 = document.querySelector("#cheer h2");
+  const text = h2.textContent.trim();
+  h2.setAttribute("aria-label", text);
+  let i = 0;
+  h2.innerHTML = text.split(" ").map((word) =>
+    '<span class="w" aria-hidden="true">' +
+    [...word].map((ch) => '<span class="l" style="--i:' + (i++) + '">' + ch + "</span>").join("") +
+    "</span>"
+  ).join(" ");
+})();
+
+// Soft hearts floating upward
+function floatHearts(count = 28) {
+  const icons = ["💙", "🩵", "🤍", "✨", "🌸", "💙"];
+  for (let i = 0; i < count; i++) {
+    const h = document.createElement("span");
+    h.className = "rise";
+    h.textContent = icons[Math.floor(Math.random() * icons.length)];
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = 18 + Math.random() * 20 + "px";
+    h.style.animationDuration = 4 + Math.random() * 3 + "s";
+    h.style.animationDelay = Math.random() * 2 + "s";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 10000);
+  }
+}
+
 function confetti(count = 40, icons = ["🍢", "🎉", "💙", "🐾", "✨"]) {
   for (let i = 0; i < count; i++) {
     const c = document.createElement("span");
@@ -151,7 +204,7 @@ yesBtn.addEventListener("click", () => {
     stage.classList.add("done");
     cheer.classList.add("show");
     cheer.setAttribute("aria-hidden", "false");
-    confetti();
+    floatHearts();
   }, 350);
 
   setTimeout(() => {
@@ -160,7 +213,7 @@ yesBtn.addEventListener("click", () => {
     void scene.offsetWidth;
     scene.classList.add("show");
     setTimeout(() => $("mail").focus(), 1900);
-  }, 2800);
+  }, 3900);
 });
 
 /* ---------- 4) Click the letter to open it ---------- */
