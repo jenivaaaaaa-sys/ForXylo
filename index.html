@@ -161,12 +161,20 @@
 
   <!-- 5. Letter -->
   <section class="letter-wrap" id="letterWrap" aria-hidden="true">
-    <article class="letter">
-      <p class="to" id="letterTo"></p>
-      <div class="body" id="letterBody"></div>
-      <p class="sign" id="letterSign"></p>
-      <button class="btn next" id="nextBtn">Next &rarr;</button>
-    </article>
+    <div class="letter-holder" id="letterHolder">
+      <article class="letter">
+        <p class="to" id="letterTo"></p>
+        <div class="body" id="letterBody"></div>
+        <p class="sign" id="letterSign"></p>
+        <button class="btn next" id="nextBtn">Next &rarr;</button>
+      </article>
+
+      <!-- Snoopy stickers that pop in around the letter after it is typed -->
+      <img class="sticker s-star"    style="--d:.05s" src="design/sticker-star.png"    alt="" onerror="this.style.display='none'">
+      <img class="sticker s-kiss"    style="--d:.25s" src="design/sticker-kiss.png"    alt="" onerror="this.style.display='none'">
+      <img class="sticker s-flowers" style="--d:.45s" src="design/sticker-flowers.png" alt="" onerror="this.style.display='none'">
+      <img class="sticker s-tulips"  style="--d:.65s" src="design/sticker-tulips.png"  alt="" onerror="this.style.display='none'">
+    </div>
   </section>
 
   <!-- 6. Choose a date -->
