@@ -20,8 +20,20 @@
   </div>
   <div class="hill" aria-hidden="true"></div>
 
+  <!-- Log in -->
+  <main class="login" id="login">
+    <form class="panel" id="loginForm" autocomplete="off">
+      <p class="small">Psst... this one's private</p>
+      <h1 class="ask">Log in</h1>
+      <label class="sr" for="codeInput">Secret code</label>
+      <input id="codeInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Enter the code" required>
+      <p class="error" id="codeError" role="alert"></p>
+      <button class="btn" type="submit">Log in</button>
+    </form>
+  </main>
+
   <!-- Stage: envelope + card -->
-  <main class="stage" id="stage">
+  <main class="stage locked" id="stage">
     <div class="env" id="env">
 
       <!-- back of envelope -->
@@ -37,6 +49,7 @@
           <button class="btn yes" id="yesBtn">Yes</button>
           <button class="btn no" id="noBtn">No</button>
         </div>
+        <p class="nochoice" id="noChoice" aria-live="polite"></p>
       </section>
 
       <!-- front pocket -->
