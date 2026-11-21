@@ -4,11 +4,11 @@ const LETTER = {
   to: "Llyod",           // how the name is displayed on the letter
   from: "Juan",          // your name, shown as the sender
   message:
-`Every sunflower turns toward the light.
-I just happen to turn toward you.
+`Happiness is a warm blanket, a quiet afternoon,
+and getting to share both with you.
 
-Thank you for the quiet mornings, the loud laughs,
-and for making ordinary days feel like a field in bloom.
+Thank you for the little moments, the big laughs,
+and for making every ordinary day feel like a good one.
 
 I hope this letter makes you smile, even a little.`
 };
@@ -46,26 +46,16 @@ form.addEventListener("submit", (e) => {
 });
 setTimeout(() => input.focus(), 200);
 
-// Twinkling stars
-const starBox = document.querySelector(".stars");
-for (let i = 0; i < 70; i++) {
-  const s = document.createElement("span");
-  s.className = "star";
-  s.style.left = Math.random() * 100 + "%";
-  s.style.top = Math.random() * 60 + "%";
-  s.style.animationDelay = Math.random() * 3 + "s";
-  starBox.appendChild(s);
-}
-
-// Falling petals
-function petals(count = 24) {
+// Falling hearts, bones and paws
+function petals(count = 22) {
+  const icons = ["💙", "🦴", "💙", "🐾"];
   for (let i = 0; i < count; i++) {
     const p = document.createElement("span");
-    p.className = "petal";
+    p.className = "heart";
+    p.textContent = icons[Math.floor(Math.random() * icons.length)];
     p.style.left = Math.random() * 100 + "vw";
     p.style.animationDuration = 3 + Math.random() * 3 + "s";
     p.style.animationDelay = Math.random() * 1.2 + "s";
-    p.style.transform = `rotate(${Math.random() * 360}deg)`;
     document.body.appendChild(p);
     setTimeout(() => p.remove(), 8000);
   }
@@ -73,16 +63,18 @@ function petals(count = 24) {
 
 // Typewriter effect
 function typeText(text) {
-  const body = $("letterBody"), sign = $("letterSign");
+  const body = $("letterBody"), signRow = document.querySelector(".sign-row");
   clearInterval(typingTimer);
   body.textContent = "";
-  sign.classList.remove("visible");
+  body.classList.remove("done");
+  signRow.classList.remove("visible");
   let i = 0;
   typingTimer = setInterval(() => {
     body.textContent += text[i++];
     if (i >= text.length) {
       clearInterval(typingTimer);
-      sign.classList.add("visible");
+      body.classList.add("done");
+      signRow.classList.add("visible");
     }
   }, 35);
 }
