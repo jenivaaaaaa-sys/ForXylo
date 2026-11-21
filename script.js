@@ -15,6 +15,8 @@ Sweet, spicy, or both. We'll fight about it there.
 See you soon!`
 };
 // ===================================
+const ACCESS_CODE = "062326";   // the code needed to open the envelope
+// ===================================
 
 const $ = (id) => document.getElementById(id);
 const env = $("env"), card = $("card"), stage = $("stage");
@@ -23,6 +25,28 @@ let typingTimer = null;
 
 $("letterTo").textContent = "Hey " + LETTER.to + ",";
 $("letterSign").textContent = "- " + LETTER.from;
+
+// 0) Log in with the secret code
+const loginForm = $("loginForm"), codeInput = $("codeInput"), codeError = $("codeError");
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (codeInput.value.trim() === ACCESS_CODE) {
+    codeError.textContent = "";
+    $("login").classList.add("hide");
+    setTimeout(() => {
+      $("login").style.display = "none";
+      stage.classList.remove("locked");
+      $("envOpen").focus();
+    }, 500);
+  } else {
+    codeError.textContent = "Wrong code. Try again.";
+    loginForm.classList.remove("shake");
+    void loginForm.offsetWidth;   // restart the shake animation
+    loginForm.classList.add("shake");
+    codeInput.select();
+  }
+});
+setTimeout(() => codeInput.focus(), 200);
 
 // 1) Click the envelope: flap opens, card rises out, envelope fades away
 function openEnvelope() {
@@ -33,8 +57,10 @@ function openEnvelope() {
 }
 $("envOpen").addEventListener("click", openEnvelope);
 
-// 2) "No" disappears, only "Yes" stays
+// 2) "No" disappears, only "Yes" stays, and "no choice ka" shows under the buttons
 noBtn.addEventListener("click", () => {
+  $("noChoice").textContent = "no choice ka";
+  $("noChoice").classList.add("show");
   noBtn.classList.add("gone");
   yesBtn.classList.add("big");
   setTimeout(() => noBtn.remove(), 450);
