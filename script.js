@@ -382,6 +382,49 @@ body {
 }
 .letter-wrap.leave .sticker { animation: none; opacity: 0; transition: opacity .3s; }
 
+
+/* ---- Photos around the letter (polaroids; they sit on the borders / beside the paper, never on the text) ---- */
+.sticker.photo {
+  z-index: 2; filter: none; background: #fff;
+  padding: 5px 5px 17px; box-shadow: 0 6px 14px rgba(20,40,90,.35);
+}
+.photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+.photo.square img { aspect-ratio: 1; }
+.photo::before {                      /* washi tape */
+  content: ""; position: absolute; top: -8px; left: 50%; width: 44%; height: 14px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: rgba(143,208,255,.7); box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+.photo::after {                       /* little heart in the caption */
+  content: "\2665"; position: absolute; left: 0; right: 0; bottom: 1px; text-align: center;
+  font-size: 11px; line-height: 15px; color: #8fb8f5;
+}
+.sticker.photo.strip { padding: 0; background: none; box-shadow: 0 6px 14px rgba(20,40,90,.35); }
+.photo.strip::after { content: none; }
+.photo.strip img { aspect-ratio: auto; }
+
+/* phones / tablets: photos peek out above and below the paper (only over the flower borders) */
+.p-piggy  { left: 22%;  top: -17%;    width: 25%; --r: -5deg; }
+.p-selfie { left: 50%;  top: -16%;    width: 24%; --r: 4deg; }
+.p-mirror { left: 24%;  bottom: -17%; width: 25%; --r: 4deg; }
+.p-night  { left: 51%;  bottom: -16%; width: 22%; --r: -5deg; }
+.p-strip  { left: -5%;  top: 13%;     width: 11%; --r: -4deg; }
+
+/* wide screens: photos sit in the empty space on both sides of the paper */
+@media (min-width: 1100px) {
+  .sticker.photo { padding: calc(var(--u) * 1.4) calc(var(--u) * 1.4) calc(var(--u) * 5); }
+  .photo::after { font-size: calc(var(--u) * 2.2); line-height: calc(var(--u) * 3.6); bottom: calc(var(--u) * .7); }
+  .photo::before { top: calc(var(--u) * -1.6); height: calc(var(--u) * 2.6); }
+  .sticker.photo.strip { padding: 0; }
+  .p-selfie { left: calc(var(--u) * -36.5); right: auto; top: 3%;  bottom: auto; width: calc(var(--u) * 30); --r: -6deg; }
+  .p-mirror { left: calc(var(--u) * -35);   right: auto; top: 56%; bottom: auto; width: calc(var(--u) * 29); --r: 5deg; }
+  .p-piggy  { right: calc(var(--u) * -36.5); left: auto; top: 1%;  bottom: auto; width: calc(var(--u) * 30); --r: 5deg; }
+  .p-night  { right: calc(var(--u) * -35);   left: auto; top: 60%; bottom: auto; width: calc(var(--u) * 29); --r: -5deg; }
+  .p-strip  { right: calc(var(--u) * -21);   left: auto; top: 31%; bottom: auto; width: calc(var(--u) * 12.5); --r: -3deg; }
+}
+/* very short screens in landscape: no room, so skip the photos */
+@media (max-width: 1099px) and (max-height: 600px) { .sticker.photo { display: none; } }
+
 /* ---------- Date pages ---------- */
 .page {
   position: fixed; inset: 0; z-index: 9; padding: 20px;
@@ -390,20 +433,82 @@ body {
 .page .panel { animation: pagein .6s cubic-bezier(.2,1.3,.4,1) both; }
 @keyframes pagein { from { opacity: 0; transform: scale(.6) rotate(6deg); } to { opacity: 1; transform: rotate(-1.5deg); } }
 
-.date-panel { width: min(400px, 100%); }
-.options { display: flex; flex-direction: column; gap: 12px; width: 100%; margin: 8px 0 6px; }
-.opt {
-  font: inherit; font-size: 1.5rem; cursor: pointer; width: 100%;
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-align: left;
-  background: #fff; color: var(--ink);
-  border: 4px solid var(--ink); border-radius: 10px; box-shadow: 4px 4px 0 var(--ink);
-  transition: transform .15s, box-shadow .15s, background .15s;
+/* ---- Choose a date (card style) ---- */
+.date-page {
+  flex-direction: column; overflow-y: auto; padding: 24px 16px;
+  background: linear-gradient(180deg, #f7fbff 0%, #dcebff 100%);
 }
-.opt span { font-size: 1.8rem; }
-.opt:hover { background: #e3f2ff; }
-.opt[aria-pressed="true"] { background: var(--btn); transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
-.opt[aria-pressed="true"]::after { content: "✔"; margin-left: auto; color: var(--deep); font-size: 1.6rem; }
-.btn.confirm { margin-top: 6px; background: #6fe39a; }
+.date-inner {
+  margin: auto; width: 100%; max-width: 860px;
+  display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative; z-index: 1;
+}
+.steps { display: flex; gap: 8px; }
+.steps span {
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: #dbe7fb; color: #7b90b8; font-family: "Fredoka", sans-serif; font-size: .85rem;
+}
+.steps span.on { background: #4f8cf0; color: #fff; box-shadow: 0 0 0 4px rgba(79,140,240,.25); }
+
+.date-title {
+  font-family: "Playfair Display", Georgia, serif; font-weight: 700; text-align: center;
+  font-size: clamp(1.5rem, 5.5vw, 2.2rem); color: #1b3a8a; letter-spacing: .02em; line-height: 1.15;
+}
+
+.date-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; }
+.date-card {
+  position: relative; font: inherit; cursor: pointer; text-align: center;
+  background: #fff; border: 3px solid transparent; border-radius: 18px; padding: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  box-shadow: 0 8px 24px rgba(60,110,200,.18);
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.date-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(60,110,200,.28); }
+.date-card:focus-visible { outline: 4px solid #1b5fc0; outline-offset: 3px; }
+.date-card[aria-checked="true"] {
+  border-color: #4f8cf0; transform: translateY(-4px); box-shadow: 0 12px 30px rgba(79,140,240,.45);
+}
+.date-card[aria-checked="true"]::after {
+  content: "\2665"; position: absolute; top: 8px; right: 10px;
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: #4f8cf0; color: #fff; font-size: 15px; box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  animation: pop .35s cubic-bezier(.2,1.8,.4,1) both;
+}
+.date-img { display: block; width: 100%; aspect-ratio: 300 / 190; border-radius: 12px; overflow: hidden; background: #cfe5ff; flex: none; }
+.date-img svg { display: block; width: 100%; height: 100%; }
+.date-text { display: flex; flex-direction: column; gap: 6px; align-items: center; padding: 2px 4px 6px; }
+.date-name {
+  font-family: "Playfair Display", Georgia, serif; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .09em; font-size: 1rem; color: #1b3a8a;
+}
+.date-desc { font-family: "Fredoka", sans-serif; font-size: .85rem; line-height: 1.35; color: #6b7a99; }
+
+.continue {
+  font-family: "Fredoka", sans-serif; font-size: 1.1rem; padding: 11px 38px; border: 0; border-radius: 999px;
+  background: #c7d3ea; color: #fff; cursor: not-allowed; box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  transition: background .25s, transform .2s, box-shadow .25s;
+}
+.continue span { color: #ffd0e0; }
+.continue:not(:disabled) { background: linear-gradient(135deg, #6aa6ff, #3f78e0); cursor: pointer; box-shadow: 0 8px 20px rgba(63,120,224,.45); }
+.continue:not(:disabled):hover { transform: translateY(-2px); }
+.continue:focus-visible { outline: 4px solid #1b5fc0; outline-offset: 3px; }
+
+/* soft hearts drifting in the background of the date page */
+.bgh { position: absolute; bottom: -40px; pointer-events: none; animation: bgrise linear infinite; }
+@keyframes bgrise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: .55; }
+  100% { transform: translateY(-115vh) translateX(18px); opacity: 0; }
+}
+
+/* phones: stack the cards, picture on the left */
+@media (max-width: 640px) {
+  .date-cards { grid-template-columns: 1fr; gap: 12px; }
+  .date-card { flex-direction: row; text-align: left; gap: 12px; padding: 10px; }
+  .date-img { width: 42%; }
+  .date-text { align-items: flex-start; flex: 1; }
+  .date-name { font-size: .9rem; }
+  .date-desc { font-size: .8rem; }
+}
 
 .confirmed-panel { width: min(420px, 100%); gap: 6px; }
 .check {
