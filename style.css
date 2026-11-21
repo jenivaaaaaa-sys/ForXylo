@@ -16,13 +16,12 @@ html, body { height: 100%; }
 body {
   font-family: "Patrick Hand", "Comic Sans MS", cursive;
   color: var(--ink);
-  background:
-    radial-gradient(rgba(255,255,255,.35) 3px, transparent 4px) 0 0 / 46px 46px,
-    linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
+  background: #7ba6e7 url("bg.jpg") no-repeat right bottom / cover;
   overflow: hidden;
 }
 
-/* ---------- Background ---------- */
+/* ---------- Background (the picture replaces the clouds and hill) ---------- */
+.sky, .hill { display: none; }
 .sky { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
 .cloud { position: absolute; width: 170px; fill: #fff; stroke: var(--ink); stroke-width: 3; animation: drift linear infinite; }
 .c1 { top: 8%;  animation-duration: 60s;  animation-delay: -10s; }
