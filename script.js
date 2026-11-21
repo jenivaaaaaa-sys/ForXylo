@@ -5,10 +5,16 @@ const LETTER = {
   message:
 Hello, my baby!
 
-Happy monthsarry!!! Baby, alam ko na ang dami nang nangyayari sa'tin these past few days, and I hope na malagpasan natin 'tooo kasi looking forward ako sa futureee. Future with youuuuuuu! Sana ma-fix natin ang mga upcoming problems and walang hiwalayan kasi I've been through so muchh pain, and nakaya ko siya because of youu and sa mga naturo mo sa'kin.
+Happy monthsarry!!! Baby, alam ko na ang dami nang nangyayari sa'tin
+these past few days, and I hope na malagpasan natin 'tooo kasi looking 
+forward ako sa futureee. Future with youuuuuuu!Sana ma-fix natin ang
+mga upcoming problems and walang hiwalayan kasi I've been through so muchh 
+pain, and nakaya ko siya because of youu and sa mga naturo mo sa'kin.
 
 
-I'm so happy to have youu, and sana huwag ito matapos kasi naniniwala ako na makakaya natin 'tong lahat kasi strong na tayo. Hindi na tayo katulad ng datiii. I love you, baby kooooooo!
+I'm so happy to have youu, and sana huwag ito matapos kasi naniniwala ako
+na makakaya natin 'tong lahat kasi strong na tayo. Hindi na tayo
+katulad ng datiii. I love you, baby kooooooo!
 HAPPY MONTHSARRYYY!!! Hihi, date tau!!
 
 
