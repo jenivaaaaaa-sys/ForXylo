@@ -12,6 +12,23 @@
 </head>
 <body>
 
+  <!-- Reusable flower shape (color comes from the <use> element) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="flower">
+        <g stroke="#111" stroke-width="3">
+          <ellipse cx="0" cy="-22" rx="13" ry="20"/>
+          <ellipse cx="0" cy="-22" rx="13" ry="20" transform="rotate(60)"/>
+          <ellipse cx="0" cy="-22" rx="13" ry="20" transform="rotate(120)"/>
+          <ellipse cx="0" cy="-22" rx="13" ry="20" transform="rotate(180)"/>
+          <ellipse cx="0" cy="-22" rx="13" ry="20" transform="rotate(240)"/>
+          <ellipse cx="0" cy="-22" rx="13" ry="20" transform="rotate(300)"/>
+        </g>
+        <circle r="11" fill="#ffe27a" stroke="#111" stroke-width="3"/>
+      </g>
+    </defs>
+  </svg>
+
   <!-- Background -->
   <div class="sky" aria-hidden="true">
     <svg class="cloud c1" viewBox="0 0 140 80"><path d="M30 60c-16 0-24-18-8-26 2-16 26-22 38-10 10-12 34-6 36 12 18 0 22 24 4 24z"/></svg>
@@ -20,28 +37,40 @@
   </div>
   <div class="hill" aria-hidden="true"></div>
 
-  <!-- Log in -->
+  <!-- 1. Log in with a numpad -->
   <main class="login" id="login">
-    <form class="panel" id="loginForm" autocomplete="off">
+    <div class="panel pad-panel" id="loginPanel">
       <p class="small">Psst... this one's private</p>
       <h1 class="ask">Log in</h1>
-      <label class="sr" for="codeInput">Secret code</label>
-      <input id="codeInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Enter the code" required>
+      <div class="dots" id="dots" aria-label="Code entered so far">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
       <p class="error" id="codeError" role="alert"></p>
-      <button class="btn" type="submit">Log in</button>
-    </form>
+      <div class="numpad" id="numpad">
+        <button class="key" data-key="1">1</button>
+        <button class="key" data-key="2">2</button>
+        <button class="key" data-key="3">3</button>
+        <button class="key" data-key="4">4</button>
+        <button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button>
+        <button class="key" data-key="7">7</button>
+        <button class="key" data-key="8">8</button>
+        <button class="key" data-key="9">9</button>
+        <button class="key alt" data-key="back" aria-label="Delete">&#9003;</button>
+        <button class="key" data-key="0">0</button>
+        <button class="key alt ok" data-key="ok" aria-label="Enter">OK</button>
+      </div>
+    </div>
   </main>
 
-  <!-- Stage: envelope + card -->
+  <!-- 2. Envelope + card -->
   <main class="stage locked" id="stage">
     <div class="env" id="env">
-
-      <!-- back of envelope -->
       <svg class="env-part env-back" viewBox="0 0 320 212" aria-hidden="true">
         <rect x="3" y="3" width="314" height="206" rx="6" fill="#2f6fd1" stroke="#111" stroke-width="6"/>
       </svg>
 
-      <!-- the card -->
       <section class="card" id="card" aria-live="polite">
         <p class="card-emoji" aria-hidden="true">🍢</p>
         <h1>kwek kwek tayo</h1>
@@ -52,17 +81,13 @@
         <p class="nochoice" id="noChoice" aria-live="polite"></p>
       </section>
 
-      <!-- front pocket -->
       <svg class="env-part env-front" viewBox="0 0 320 212" aria-hidden="true">
         <path d="M3 3 L160 118 L317 3 V206 Q317 209 314 209 H6 Q3 209 3 206 Z" fill="#5aa9f0" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
       </svg>
-
-      <!-- flap -->
       <svg class="env-part env-flap" viewBox="0 0 320 212" aria-hidden="true">
         <path d="M3 3 H317 L160 122 Z" fill="#8fd0ff" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
       </svg>
 
-      <!-- click target -->
       <button class="env-open" id="envOpen" aria-label="Open the envelope">
         <span class="env-seal" aria-hidden="true">
           <svg viewBox="0 0 100 100"><g fill="#fff" stroke="#111" stroke-width="4">
@@ -78,20 +103,93 @@
     <p class="hint" id="hint">Tap the envelope to open it</p>
   </main>
 
-  <!-- HELL YEAHHH -->
+  <!-- 3. HELL YEAHHH -->
   <section class="cheer" id="cheer" aria-hidden="true">
     <div class="burst"></div>
     <h2>HELL YEAHHH</h2>
   </section>
 
-  <!-- Letter -->
+  <!-- 4. Blue bouquet + closed letter -->
+  <section class="bouquet-scene" id="bouquetScene" hidden>
+    <svg class="bouquet" viewBox="0 0 300 370" role="img" aria-label="A bouquet of blue flowers">
+      <!-- stems -->
+      <g stroke="#2f8a3c" stroke-width="6" stroke-linecap="round" fill="none">
+        <path d="M150 80 C150 150 150 200 150 270"/>
+        <path d="M88 118 C100 180 135 220 150 270"/>
+        <path d="M212 118 C200 180 165 220 150 270"/>
+        <path d="M55 178 C75 220 125 245 150 270"/>
+        <path d="M245 178 C225 220 175 245 150 270"/>
+        <path d="M120 172 C128 210 142 240 150 270"/>
+        <path d="M180 172 C172 210 158 240 150 270"/>
+      </g>
+      <!-- leaves -->
+      <g fill="#58c26a" stroke="#111" stroke-width="3">
+        <path d="M118 225 C85 215 70 190 78 175 C105 180 120 200 118 225Z"/>
+        <path d="M182 225 C215 215 230 190 222 175 C195 180 180 200 182 225Z"/>
+      </g>
+      <!-- flowers -->
+      <g class="blooms">
+        <use href="#flower" transform="translate(55 178) scale(.72)" fill="#7fc4ff"/>
+        <use href="#flower" transform="translate(245 178) scale(.72)" fill="#5a8cf0"/>
+        <use href="#flower" transform="translate(88 116) scale(.82)" fill="#2f6fd1"/>
+        <use href="#flower" transform="translate(212 116) scale(.82)" fill="#a9d9ff"/>
+        <use href="#flower" transform="translate(120 170) scale(.85)" fill="#a9d9ff"/>
+        <use href="#flower" transform="translate(180 170) scale(.85)" fill="#2f6fd1"/>
+        <use href="#flower" transform="translate(150 76) scale(.95)" fill="#4f9be8"/>
+      </g>
+      <!-- wrapping paper -->
+      <path d="M92 252 L208 252 L170 358 Q150 366 130 358 Z" fill="#fffdf5" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M92 252 L150 300 L208 252" fill="#d6ecff" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+      <!-- ribbon bow -->
+      <g fill="#2f6fd1" stroke="#111" stroke-width="4" stroke-linejoin="round">
+        <path d="M150 292 C120 270 112 300 128 308 C140 312 148 300 150 292Z"/>
+        <path d="M150 292 C180 270 188 300 172 308 C160 312 152 300 150 292Z"/>
+        <circle cx="150" cy="296" r="9"/>
+      </g>
+    </svg>
+
+    <button class="mail" id="mail" aria-label="Open the letter">
+      <svg viewBox="0 0 200 130" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="122" rx="8" fill="#fffdf5" stroke="#111" stroke-width="6"/>
+        <path d="M4 10 L100 80 L196 10" fill="#d6ecff" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
+        <circle cx="100" cy="76" r="17" fill="#2f6fd1" stroke="#111" stroke-width="5"/>
+        <path d="M100 85 C88 77 90 66 96 66 C99 66 100 69 100 70 C100 69 101 66 104 66 C110 66 112 77 100 85Z" fill="#fff"/>
+      </svg>
+    </button>
+    <p class="hint" id="mailHint">Tap the letter to open it</p>
+  </section>
+
+  <!-- 5. Letter -->
   <section class="letter-wrap" id="letterWrap" aria-hidden="true">
     <article class="letter">
       <p class="to" id="letterTo"></p>
       <div class="body" id="letterBody"></div>
       <p class="sign" id="letterSign"></p>
-      <button class="btn again" id="againBtn">Start over</button>
+      <button class="btn next" id="nextBtn">Next &rarr;</button>
     </article>
+  </section>
+
+  <!-- 6. Choose a date -->
+  <section class="page" id="datePage" hidden>
+    <div class="panel date-panel">
+      <h1 class="ask">Choose a date</h1>
+      <div class="options" id="options" role="group" aria-label="Date choices">
+        <button class="opt" data-date="Computer shop" data-emoji="💻" aria-pressed="false"><span>💻</span> Computer shop</button>
+        <button class="opt" data-date="Dinner" data-emoji="🍽️" aria-pressed="false"><span>🍽️</span> Dinner</button>
+        <button class="opt" data-date="Netflix and chill" data-emoji="🍿" aria-pressed="false"><span>🍿</span> Netflix and chill</button>
+      </div>
+      <button class="btn confirm" id="confirmBtn" disabled>Confirm</button>
+    </div>
+  </section>
+
+  <!-- 7. Date confirmed -->
+  <section class="page" id="confirmPage" hidden>
+    <div class="panel confirmed-panel">
+      <p class="check" aria-hidden="true">✔</p>
+      <h2 class="big-title">DATE CONFIRMED</h2>
+      <p class="chosen" id="chosen"></p>
+      <p class="small">See you there 💙</p>
+    </div>
   </section>
 
   <script src="script.js"></script>
