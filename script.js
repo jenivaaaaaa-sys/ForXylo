@@ -33,7 +33,7 @@ const codeError = $("codeError");
 let loginOpen = true;
 
 function renderDots() {
-  dots.forEach((d, i) => d.classList.toggle("on", i < entered.length));
+  dots.forEach((d, i) => { d.textContent = entered[i] || ""; });
 }
 
 function submitCode() {
