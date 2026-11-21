@@ -26,12 +26,24 @@ let typingTimer = null;
 $("letterTo").textContent = "Hey " + LETTER.to + ",";
 $("letterSign").textContent = "- " + LETTER.from;
 
-// 0) Log in with the secret code
-const loginForm = $("loginForm"), codeInput = $("codeInput"), codeError = $("codeError");
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (codeInput.value.trim() === ACCESS_CODE) {
+/* ---------- 0) Log in with the numpad ---------- */
+let entered = "";
+const dots = document.querySelectorAll("#dots .dot");
+const codeError = $("codeError");
+let loginOpen = true;
+
+function renderDots() {
+  dots.forEach((d, i) => d.classList.toggle("on", i < entered.length));
+}
+
+function submitCode() {
+  if (entered.length < ACCESS_CODE.length) {
+    codeError.textContent = "Enter all 6 digits.";
+    return;
+  }
+  if (entered === ACCESS_CODE) {
     codeError.textContent = "";
+    loginOpen = false;
     $("login").classList.add("hide");
     setTimeout(() => {
       $("login").style.display = "none";
@@ -40,15 +52,44 @@ loginForm.addEventListener("submit", (e) => {
     }, 500);
   } else {
     codeError.textContent = "Wrong code. Try again.";
-    loginForm.classList.remove("shake");
-    void loginForm.offsetWidth;   // restart the shake animation
-    loginForm.classList.add("shake");
-    codeInput.select();
+    const panel = $("loginPanel");
+    panel.classList.remove("shake");
+    void panel.offsetWidth;          // restart the shake animation
+    panel.classList.add("shake");
+    entered = "";
+    renderDots();
   }
-});
-setTimeout(() => codeInput.focus(), 200);
+}
 
-// 1) Click the envelope: flap opens, card rises out, envelope fades away
+function pressKey(k) {
+  if (!loginOpen) return;
+  if (k === "back") {
+    entered = entered.slice(0, -1);
+    codeError.textContent = "";
+  } else if (k === "ok") {
+    submitCode();
+    return;
+  } else if (entered.length < ACCESS_CODE.length) {
+    entered += k;
+    codeError.textContent = "";
+  }
+  renderDots();
+  if (entered.length === ACCESS_CODE.length) setTimeout(submitCode, 150);
+}
+
+$("numpad").addEventListener("click", (e) => {
+  const btn = e.target.closest(".key");
+  if (btn) pressKey(btn.dataset.key);
+});
+// Keyboard support too
+document.addEventListener("keydown", (e) => {
+  if (!loginOpen) return;
+  if (/^[0-9]$/.test(e.key)) pressKey(e.key);
+  else if (e.key === "Backspace") pressKey("back");
+  else if (e.key === "Enter") pressKey("ok");
+});
+
+/* ---------- 1) Click the envelope ---------- */
 function openEnvelope() {
   env.classList.add("open");
   $("hint").classList.add("hide");
@@ -57,7 +98,7 @@ function openEnvelope() {
 }
 $("envOpen").addEventListener("click", openEnvelope);
 
-// 2) "No" disappears, only "Yes" stays, and "no choice ka" shows under the buttons
+/* ---------- 2) "No" disappears, "no choice ka" appears ---------- */
 noBtn.addEventListener("click", () => {
   $("noChoice").textContent = "no choice ka";
   $("noChoice").classList.add("show");
@@ -67,9 +108,8 @@ noBtn.addEventListener("click", () => {
   yesBtn.focus();
 });
 
-// 3) "Yes" -> HELL YEAHHH + confetti -> letter pops out
-function confetti(count = 40) {
-  const icons = ["🍢", "🎉", "💙", "🐾", "✨"];
+/* ---------- helpers ---------- */
+function confetti(count = 40, icons = ["🍢", "🎉", "💙", "🐾", "✨"]) {
   for (let i = 0; i < count; i++) {
     const c = document.createElement("span");
     c.className = "confetti";
@@ -83,11 +123,12 @@ function confetti(count = 40) {
 }
 
 function typeText(text) {
-  const body = $("letterBody"), sign = $("letterSign");
+  const body = $("letterBody"), sign = $("letterSign"), next = $("nextBtn");
   clearInterval(typingTimer);
   body.textContent = "";
   body.classList.remove("done");
   sign.classList.remove("visible");
+  next.classList.remove("visible");
   let i = 0;
   typingTimer = setInterval(() => {
     body.textContent += text[i++];
@@ -95,10 +136,13 @@ function typeText(text) {
       clearInterval(typingTimer);
       body.classList.add("done");
       sign.classList.add("visible");
+      next.classList.add("visible");
     }
   }, 35);
 }
 
+/* ---------- 3) Yes -> HELL YEAHHH -> blue bouquet + closed letter ---------- */
+const scene = $("bouquetScene");
 yesBtn.addEventListener("click", () => {
   yesBtn.disabled = true;
   card.classList.add("leave");
@@ -110,15 +154,56 @@ yesBtn.addEventListener("click", () => {
     confetti();
   }, 350);
 
-  // after the cheer, the letter pops out
   setTimeout(() => {
     cheer.classList.add("fade");
+    scene.hidden = false;
+    void scene.offsetWidth;
+    scene.classList.add("show");
+    setTimeout(() => $("mail").focus(), 1900);
+  }, 2800);
+});
+
+/* ---------- 4) Click the letter to open it ---------- */
+$("mail").addEventListener("click", () => {
+  scene.classList.add("leave");
+  setTimeout(() => {
+    scene.hidden = true;
     const wrap = $("letterWrap");
     wrap.classList.add("show");
     wrap.setAttribute("aria-hidden", "false");
     typeText(LETTER.message);
-  }, 2800);
+  }, 500);
 });
 
-// Start over
-$("againBtn").addEventListener("click", () => location.reload());
+/* ---------- 5) Next -> Choose a date ---------- */
+let chosenDate = "", chosenEmoji = "";
+$("nextBtn").addEventListener("click", () => {
+  clearInterval(typingTimer);
+  const wrap = $("letterWrap");
+  wrap.classList.remove("show");
+  wrap.classList.add("leave");
+  setTimeout(() => {
+    wrap.style.display = "none";
+    $("datePage").hidden = false;
+  }, 450);
+});
+
+const opts = document.querySelectorAll(".opt");
+opts.forEach((o) => {
+  o.addEventListener("click", () => {
+    opts.forEach((x) => x.setAttribute("aria-pressed", "false"));
+    o.setAttribute("aria-pressed", "true");
+    chosenDate = o.dataset.date;
+    chosenEmoji = o.dataset.emoji;
+    $("confirmBtn").disabled = false;
+  });
+});
+
+/* ---------- 6) Confirm -> Date confirmed ---------- */
+$("confirmBtn").addEventListener("click", () => {
+  if (!chosenDate) return;
+  $("datePage").hidden = true;
+  $("chosen").textContent = chosenEmoji + " " + chosenDate;
+  $("confirmPage").hidden = false;
+  confetti(50, ["💙", "🎉", "✨", "🌸", chosenEmoji]);
+});
