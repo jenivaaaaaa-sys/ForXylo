@@ -1,16 +1,16 @@
 // ====== EDIT YOUR LETTER HERE ======
 const LETTER = {
-  to: "You",
-  from: "Me",
+  to: "My Ali",
+  from: "Jenibabes",
   message:
-`Okay, real talk.
+Hello, my baby!
 
-I've been craving kwek kwek all week
-and the only thing that would make it better
-is eating it with you.
+Happy monthsarry!!! Baby, alam ko na ang dami nang nangyayari sa'tin these past few days, and I hope na malagpasan natin 'tooo kasi looking forward ako sa futureee. Future with youuuuuuu! Sana ma-fix natin ang mga upcoming problems and walang hiwalayan kasi I've been through so muchh pain, and nakaya ko siya because of youu and sa mga naturo mo sa'kin.
 
-My treat. Sauce is on me.
-Sweet, spicy, or both. We'll fight about it there.
+
+I'm so happy to have youu, and sana huwag ito matapos kasi naniniwala ako na makakaya natin 'tong lahat kasi strong na tayo. Hindi na tayo katulad ng datiii. I love you, baby kooooooo!
+HAPPY MONTHSARRYYY!!! Hihi, date tau!!
+
 
 See you soon!`
 };
