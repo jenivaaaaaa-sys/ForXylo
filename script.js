@@ -1,400 +1,265 @@
-:root {
-  --sky-top: #2f86e8;
-  --sky-bottom: #bfe3ff;
-  --ink: #111;
-  --blue: #2f6fd1;
-  --deep: #1b5fc0;
-  --paper: #f1f8ff;
-  --btn: #8fd0ff;
-  --w: min(320px, 82vw);
+// ====== EDIT YOUR LETTER HERE ======
+const LETTER = {
+  to: "You",
+  from: "Me",
+  message:
+`Okay, real talk.
+
+I've been craving kwek kwek all week
+and the only thing that would make it better
+is eating it with you.
+
+My treat. Sauce is on me.
+Sweet, spicy, or both. We'll fight about it there.
+
+See you soon!`
+};
+// ===================================
+const ACCESS_CODE = "062326";   // the code needed to open the envelope
+// ===================================
+
+const $ = (id) => document.getElementById(id);
+const env = $("env"), card = $("card"), stage = $("stage");
+const yesBtn = $("yesBtn"), noBtn = $("noBtn");
+let typingTimer = null;
+
+$("letterTo").textContent = "Hey " + LETTER.to + ",";
+$("letterSign").textContent = "- " + LETTER.from;
+
+/* ---------- 0) Log in with the numpad ---------- */
+let entered = "";
+const dots = document.querySelectorAll("#dots .dot");
+const codeError = $("codeError");
+let loginOpen = true;
+
+function renderDots() {
+  dots.forEach((d, i) => { d.textContent = entered[i] || ""; });
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-[hidden] { display: none !important; }
-
-body {
-  font-family: "Patrick Hand", "Comic Sans MS", cursive;
-  color: var(--ink);
-  background:
-    url("design/cloudy-sky-tile.jpg") repeat 0 0 / 1000px auto,
-    url("design/Charlie%20Brown%20Cloudy%20Sky.jpg") repeat 0 0 / 1000px auto,
-    #c8e6f8;
-  animation: skydrift 90s linear infinite;
-  overflow: hidden;
+function submitCode() {
+  if (entered.length < ACCESS_CODE.length) {
+    codeError.textContent = "Enter all 6 digits.";
+    return;
+  }
+  if (entered === ACCESS_CODE) {
+    codeError.textContent = "";
+    loginOpen = false;
+    $("login").classList.add("hide");
+    setTimeout(() => {
+      $("login").style.display = "none";
+      stage.classList.remove("locked");
+      $("envOpen").focus();
+    }, 500);
+  } else {
+    codeError.textContent = "Wrong code. Try again.";
+    const panel = $("loginPanel");
+    panel.classList.remove("shake");
+    void panel.offsetWidth;          // restart the shake animation
+    panel.classList.add("shake");
+    entered = "";
+    renderDots();
+  }
 }
 
-/* ---------- Background (cloud picture, slowly drifting) ---------- */
-@keyframes skydrift { to { background-position: 1000px 0; } }
-.sky, .hill { display: none; }
-.sky { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
-.cloud { position: absolute; width: 170px; fill: #fff; stroke: var(--ink); stroke-width: 3; animation: drift linear infinite; }
-.c1 { top: 8%;  animation-duration: 60s;  animation-delay: -10s; }
-.c2 { top: 24%; width: 120px; animation-duration: 80s; animation-delay: -40s; }
-.c3 { top: 14%; width: 210px; animation-duration: 100s; animation-delay: -70s; }
-@keyframes drift { from { left: -240px; } to { left: 110vw; } }
-
-.hill {
-  position: fixed; left: -10%; right: -10%; bottom: -55%; height: 70%;
-  background: #5aa9f0; border: 5px solid var(--ink); border-radius: 50% 50% 0 0;
-  pointer-events: none;
+function pressKey(k) {
+  if (!loginOpen) return;
+  if (k === "back") {
+    entered = entered.slice(0, -1);
+    codeError.textContent = "";
+  } else if (k === "ok") {
+    submitCode();
+    return;
+  } else if (entered.length < ACCESS_CODE.length) {
+    entered += k;
+    codeError.textContent = "";
+  }
+  renderDots();
+  if (entered.length === ACCESS_CODE.length) setTimeout(submitCode, 150);
 }
 
-/* ---------- Shared panel / buttons ---------- */
-.panel {
-  width: min(400px, 100%);
-  background: var(--paper);
-  background-image: linear-gradient(#cfe9ff 0 14px, transparent 14px);
-  border: 6px solid var(--ink); border-radius: 10px;
-  box-shadow: 8px 8px 0 var(--ink);
-  padding: 30px 24px 26px;
-  display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
-  transform: rotate(-1.5deg);
-}
-.small { font-size: 1.4rem; }
-.ask { font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 400; line-height: 1.05; }
-.error { min-height: 1.4em; color: #c0252f; font-size: 1.2rem; }
-.panel.shake { animation: shake .4s; }
-@keyframes shake {
-  20%,60% { transform: rotate(-1.5deg) translateX(-8px); }
-  40%,80% { transform: rotate(-1.5deg) translateX(8px); }
+$("numpad").addEventListener("click", (e) => {
+  const btn = e.target.closest(".key");
+  if (btn) pressKey(btn.dataset.key);
+});
+// Keyboard support too
+document.addEventListener("keydown", (e) => {
+  if (!loginOpen) return;
+  if (/^[0-9]$/.test(e.key)) pressKey(e.key);
+  else if (e.key === "Backspace") pressKey("back");
+  else if (e.key === "Enter") pressKey("ok");
+});
+
+/* ---------- 1) Click the envelope ---------- */
+function openEnvelope() {
+  env.classList.add("open");
+  $("hint").classList.add("hide");
+  setTimeout(() => env.classList.add("rise"), 450);
+  setTimeout(() => { env.classList.add("out"); centerCard(); }, 1500);
 }
 
-.btn {
-  font: inherit; font-size: 1.4rem; cursor: pointer;
-  padding: 6px 22px; border-radius: 8px;
-  border: 4px solid var(--ink); background: var(--btn); color: var(--ink);
-  box-shadow: 4px 4px 0 var(--ink);
-  transition: transform .2s, box-shadow .15s;
+// Lift the card out of the envelope and glide it to the exact middle of the window
+function centerCard() {
+  const r = card.getBoundingClientRect();
+  env.style.perspective = "none";              // so "fixed" is measured from the window
+  card.style.transition = "none";
+  card.style.position = "fixed";
+  card.style.left = r.left + "px";
+  card.style.top = r.top + "px";
+  card.style.width = r.width + "px";
+  card.style.height = r.height + "px";
+  card.style.transform = "none";
+  void card.offsetWidth;                       // apply the starting spot first
+  const ease = "cubic-bezier(.2,.9,.3,1.1)";
+  card.style.transition = "left .8s " + ease + ", top .8s " + ease + ", transform .8s " + ease + ", opacity .4s ease";
+  card.dataset.w = r.width; card.dataset.h = r.height;
+  placeCard();
+  card.style.transform = "scale(1.22)";
 }
-.btn:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
-.btn:focus-visible, .key:focus-visible, .opt:focus-visible { outline: 4px solid var(--deep); outline-offset: 3px; }
-.btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn.yes { background: #6fe39a; }
-.btn.no  { background: #fff; }
-.btn.no.gone { animation: vanish .45s forwards; }
-.btn.yes.big { animation: grow .5s forwards, pulse 1.2s .5s ease-in-out infinite; }
-@keyframes vanish { to { transform: scale(0) rotate(-40deg); opacity: 0; } }
-@keyframes grow { to { transform: scale(1.35); } }
-@keyframes pulse { 0%,100% { transform: scale(1.35); } 50% { transform: scale(1.5); } }
+function placeCard() {
+  card.style.left = (window.innerWidth  - card.dataset.w) / 2 + "px";
+  card.style.top  = (window.innerHeight - card.dataset.h) / 2 + "px";
+}
+window.addEventListener("resize", () => { if (card.dataset.w) placeCard(); });
+$("envOpen").addEventListener("click", openEnvelope);
 
-/* ---------- Log in numpad (red gingham) ---------- */
-.login {
-  position: fixed; inset: 0; z-index: 3;
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-  background-color: #2f6fd1;
-  background-image:
-    repeating-linear-gradient(0deg,  rgba(8,30,100,.28) 0 36px, transparent 36px 72px),
-    repeating-linear-gradient(90deg, rgba(8,30,100,.28) 0 36px, transparent 36px 72px);
-  overflow-y: auto;
-  transition: opacity .5s ease, transform .5s ease;
-}
-.login.hide { opacity: 0; transform: scale(1.05); pointer-events: none; }
-.stage.locked { display: none; }
+/* ---------- 2) "No" disappears, "no choice ka" appears ---------- */
+noBtn.addEventListener("click", () => {
+  $("noChoice").textContent = "no choice ka";
+  $("noChoice").classList.add("show");
+  noBtn.classList.add("gone");
+  yesBtn.classList.add("big");
+  setTimeout(() => noBtn.remove(), 450);
+  yesBtn.focus();
+});
 
-.code-wrap {
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
-  width: min(340px, 100%); margin: auto;
-}
-.code-title {
-  font-family: "Bevan", Georgia, serif; font-weight: 400; color: #fff;
-  font-size: clamp(2rem, 9vw, 2.6rem); letter-spacing: 1px; text-shadow: 3px 3px 0 #123a8a;
-}
-.dots { display: flex; gap: 8px; }
-.dot {
-  width: 46px; height: 54px; display: grid; place-items: center;
-  background: #fff; border: 4px solid var(--ink); border-radius: 8px;
-  font-family: "Bevan", Georgia, serif; font-size: 1.9rem; color: #1b5fc0; line-height: 1;
-}
-.dot:empty::before { content: "\2665"; color: #a9d9ff; font-size: 1.8rem; }
-.hint-text {
-  font-family: "Fredoka", "Patrick Hand", sans-serif; font-size: 1.05rem; color: #fff; text-align: center;
-}
-.login .error { color: #ffe27a; font-family: "Fredoka", sans-serif; text-shadow: 1px 1px 0 #123a8a; min-height: 1.4em; margin-top: -6px; }
-.code-wrap.shake { animation: shake2 .4s; }
-@keyframes shake2 { 20%,60% { transform: translateX(-9px); } 40%,80% { transform: translateX(9px); } }
+/* ---------- helpers ---------- */
+// Split "HELL YEAHHH" into letters so they can pop in one by one
+(function () {
+  const h2 = document.querySelector("#cheer h2");
+  const text = h2.textContent.trim();
+  h2.setAttribute("aria-label", text);
+  let i = 0;
+  h2.innerHTML = text.split(" ").map((word) =>
+    '<span class="w" aria-hidden="true">' +
+    [...word].map((ch) => '<span class="l" style="--i:' + (i++) + '">' + ch + "</span>").join("") +
+    "</span>"
+  ).join(" ");
+})();
 
-.numpad {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: min(260px, 100%);
-  padding: 16px; background: #fff; border: 4px solid var(--ink); border-radius: 30px;
-}
-.key {
-  font-family: "Fredoka", "Patrick Hand", sans-serif; font-weight: 600; font-size: 1.7rem; line-height: 1;
-  cursor: pointer; padding: 15px 0; color: #fff;
-  background: #2f6fd1; border: 0; border-radius: 12px;
-  transition: transform .1s, background .15s;
-  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-}
-.key:hover { background: #4f8cf0; }
-.key:active { transform: scale(.92); background: #1b4fa8; }
-.key.small-key { font-size: 1.05rem; }
-
-/* ---------- Stage & envelope ---------- */
-.stage {
-  position: relative; z-index: 2; min-height: 100vh; min-height: 100dvh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
-  padding: 20px; transition: opacity .5s ease, transform .5s ease;
-}
-.stage.done { opacity: 0; transform: scale(.9); pointer-events: none; }
-
-.env {
-  position: relative; width: var(--w); height: calc(var(--w) * .6625);
-  perspective: 900px; filter: drop-shadow(8px 8px 0 rgba(17,17,17,.9));
-  animation: wobble 2.6s ease-in-out infinite;
-}
-.env.open { animation: none; filter: none; }
-@keyframes wobble { 0%,100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg) translateY(-6px); } }
-
-.env-part { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity .6s ease; pointer-events: none; }
-.env-back  { z-index: 1; }
-.env-front { z-index: 3; }
-.env-flap  { z-index: 4; transform-origin: top center; transition: transform .6s ease, z-index 0s .3s, opacity .6s ease; }
-.env.open .env-flap { transform: rotateX(180deg); z-index: 1; }
-
-.env-open { position: absolute; inset: 0; z-index: 6; background: none; border: 0; cursor: pointer; }
-.env-seal {
-  position: absolute; left: 50%; top: 48%; width: 22%; aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  background: var(--blue); border: 5px solid var(--ink); border-radius: 50%;
-  display: grid; place-items: center; box-shadow: 3px 3px 0 var(--ink);
-  transition: opacity .3s, transform .3s;
-}
-.env-seal svg { width: 70%; }
-.env-open:hover .env-seal { transform: translate(-50%, -50%) scale(1.1); }
-.env-open:focus-visible { outline: 4px solid #fff; outline-offset: 6px; border-radius: 8px; }
-.env.open .env-open { pointer-events: none; }
-.env.open .env-seal { opacity: 0; }
-
-.hint { font-size: 1.5rem; color: #fff; text-shadow: 2px 2px 0 var(--ink); animation: bob 1.6s ease-in-out infinite; transition: opacity .3s; }
-.hint.hide { opacity: 0; }
-@keyframes bob { 50% { transform: translateY(5px); } }
-
-/* ---------- Card ---------- */
-.card {
-  position: absolute; z-index: 2; left: 5%; top: 4%; width: 90%; height: 86%;
-  background: var(--paper); border: 5px solid var(--ink); border-radius: 8px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  text-align: center; padding: 8px;
-  transition: transform .8s cubic-bezier(.2,.9,.3,1.1), opacity .4s ease;
-  pointer-events: none;
-}
-.card-emoji { font-size: 1.7rem; line-height: 1; }
-.card h1 { font-size: clamp(1.7rem, 7vw, 2.1rem); font-weight: 400; line-height: 1; }
-.choices { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 6px; min-height: 52px; }
-.env.rise .card { transform: translateY(-62%); }
-.env.out .card { pointer-events: auto; box-shadow: 6px 6px 0 var(--ink); }
-.env.out .env-back, .env.out .env-front, .env.out .env-flap { opacity: 0; }
-
-/* stamp on the envelope */
-.env-stamp {
-  position: absolute; z-index: 5; right: 5%; bottom: 8%; width: 30%; height: auto;
-  transform: rotate(5deg); pointer-events: none;
-  filter: drop-shadow(2px 3px 0 rgba(17,17,17,.55));
-  transition: opacity .6s ease;
-}
-.env.out .env-stamp { opacity: 0; }
-.card.leave { transform: scale(0) rotate(12deg) !important; opacity: 0; }
-
-.nochoice {
-  min-height: 1.2em; font-size: 1.15rem; color: #c0252f; line-height: 1;
-  opacity: 0; transform: translateY(-4px); transition: opacity .3s, transform .3s;
-}
-.nochoice.show { opacity: 1; transform: none; }
-
-/* ---------- HELL YEAHHH (sweet version) ---------- */
-.cheer {
-  position: fixed; inset: 0; z-index: 5; display: grid; place-items: center;
-  pointer-events: none; opacity: 0; transition: opacity .5s ease;
-}
-.cheer.show { opacity: 1; }
-.cheer.fade { opacity: 0; transition: opacity .9s ease; }
-
-.burst {
-  position: absolute; width: min(125vw, 760px); aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(207,233,255,.75) 38%, rgba(207,233,255,0) 70%);
-  transform: scale(.4); opacity: 0;
-}
-.cheer.show .burst { animation: glowin 1.1s ease-out forwards, breathe 3s 1.1s ease-in-out infinite; }
-@keyframes glowin { to { transform: scale(1); opacity: 1; } }
-@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-
-.cheer h2 {
-  position: relative; font-family: "Fredoka", "Patrick Hand", sans-serif; font-weight: 600;
-  font-size: clamp(2.6rem, 13vw, 6.5rem); letter-spacing: 2px; text-align: center; line-height: 1.05;
-  color: #fff; -webkit-text-stroke: 7px #5a8cf0; paint-order: stroke fill;
-  text-shadow: 0 7px 0 #a9d9ff; padding: 0 12px;
-}
-.cheer h2 .w { display: inline-block; white-space: nowrap; margin: 0 .12em; }
-.cheer h2 .l { display: inline-block; opacity: 0; transform: translateY(26px) scale(.3); }
-.cheer.show h2 .l {
-  animation:
-    sweetpop .75s calc(var(--i) * 60ms + .25s) cubic-bezier(.3,1.6,.5,1) forwards,
-    wave 2.2s calc(var(--i) * 90ms + 1.4s) ease-in-out infinite;
-}
-@keyframes sweetpop { to { opacity: 1; transform: none; } }
-@keyframes wave { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-/* Hearts that float up softly */
-.rise {
-  position: fixed; bottom: -50px; z-index: 12; pointer-events: none;
-  animation: riseup linear forwards;
-}
-@keyframes riseup {
-  0%   { transform: translateY(0) translateX(0) scale(.6); opacity: 0; }
-  10%  { opacity: 1; }
-  50%  { transform: translateY(-55vh) translateX(18px) scale(1); }
-  100% { transform: translateY(-115vh) translateX(-14px) scale(.9); opacity: 0; }
+// Soft hearts floating upward
+function floatHearts(count = 28) {
+  const icons = ["💙", "🩵", "🤍", "✨", "🌸", "💙"];
+  for (let i = 0; i < count; i++) {
+    const h = document.createElement("span");
+    h.className = "rise";
+    h.textContent = icons[Math.floor(Math.random() * icons.length)];
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = 18 + Math.random() * 20 + "px";
+    h.style.animationDuration = 4 + Math.random() * 3 + "s";
+    h.style.animationDelay = Math.random() * 2 + "s";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 10000);
+  }
 }
 
-/* Confetti */
-.confetti { position: fixed; top: -40px; z-index: 12; pointer-events: none; font-size: 26px; animation: fall linear forwards; }
-@keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
-
-/* ---------- Bouquet + closed letter ---------- */
-.bouquet-scene {
-  position: fixed; inset: 0; z-index: 6;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
-  opacity: 0; transition: opacity .5s ease;
-}
-.bouquet-scene.show { opacity: 1; }
-.bouquet-scene.leave { opacity: 0; transform: scale(.9); transition: opacity .5s, transform .5s; }
-
-.bouquet {
-  display: block; flex: none; height: min(340px, 42vh); max-width: 80vw; width: auto; aspect-ratio: 300 / 370; overflow: visible;
-  transform-origin: 50% 100%; transform: scale(0); filter: drop-shadow(6px 6px 0 rgba(17,17,17,.85));
-}
-.bouquet-scene.show .bouquet { animation: bloom 1s cubic-bezier(.2,1.4,.4,1) forwards, sway 4s 1s ease-in-out infinite; }
-@keyframes bloom { to { transform: scale(1); } }
-@keyframes sway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
-
-.mail {
-  flex: none; width: min(170px, 42vw); margin-top: -64px; z-index: 2; position: relative;
-  background: none; border: 0; cursor: pointer; opacity: 0; transform: translateY(40px) scale(.6);
-  filter: drop-shadow(5px 5px 0 rgba(17,17,17,.85));
-}
-.bouquet-scene.show .mail { animation: mailin .7s 1.2s cubic-bezier(.2,1.4,.4,1) forwards, mailbob 2s 2s ease-in-out infinite; }
-@keyframes mailin { to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes mailbob { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-5px); } }
-.mail:hover { filter: drop-shadow(5px 5px 0 rgba(17,17,17,.85)) brightness(1.06); }
-.mail:focus-visible { outline: 4px solid #fff; outline-offset: 6px; border-radius: 10px; }
-.mail svg { display: block; width: 100%; }
-.bouquet-scene .hint { flex: none; margin-top: 18px; text-align: center; opacity: 0; animation: none; }
-.bouquet-scene.show .hint { animation: fadein .5s 2s forwards, bob 1.6s 2.5s ease-in-out infinite; }
-@keyframes fadein { to { opacity: 1; } }
-
-/* ---------- Letter (uses design/letter-paper.jpg) ---------- */
-.letter-wrap {
-  position: fixed; inset: 0; z-index: 8; padding: 12px;
-  display: flex; align-items: center; justify-content: center; pointer-events: none;
-}
-.letter-holder {
-  position: relative;
-  /* --u = 1% of the letter's width, so text and stickers scale with the paper */
-  --lw: min(90vw, 560px, calc(88vh * 0.6964));
-  --u: calc(var(--lw) / 100);
-  --line: calc(var(--u) * 4.173);          /* distance between the ruled lines */
-  width: var(--lw);
-}
-.letter {
-  width: 100%; aspect-ratio: 1124 / 1614;
-  background: #fff url("design/letter-paper.jpg") center / 100% 100% no-repeat;
-  border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.4);
-  /* keep the writing inside the ruled area of the picture */
-  padding: calc(var(--u) * 16) calc(var(--u) * 16.6) calc(var(--u) * 14) calc(var(--u) * 14.4);
-  overflow-y: auto; scrollbar-width: none;
-  color: #1c2a4a;
-  transform: scale(0) rotate(-12deg); opacity: 0;
-}
-.letter::-webkit-scrollbar { display: none; }
-.letter-wrap.show { pointer-events: auto; }
-.letter-wrap.show .letter { animation: popout .8s cubic-bezier(.2,1.5,.4,1) forwards; }
-.letter-wrap.leave .letter { animation: letterout .45s ease-in forwards; }
-@keyframes popout { 60% { opacity: 1; } to { transform: scale(1) rotate(-.6deg); opacity: 1; } }
-@keyframes letterout { from { transform: scale(1); opacity: 1; } to { transform: scale(.7) translateY(-60px); opacity: 0; } }
-
-.letter .to { font-size: calc(var(--u) * 4.6); line-height: var(--line); }
-.letter .body {
-  font-family: "Special Elite", "Courier New", monospace;
-  font-size: calc(var(--u) * 3.3); line-height: var(--line);
-  white-space: pre-wrap; min-height: calc(var(--line) * 10);
-}
-.body::after { content: "▍"; animation: blink 1s steps(1) infinite; }
-.body.done::after { content: ""; }
-@keyframes blink { 50% { opacity: 0; } }
-.letter .sign {
-  font-size: calc(var(--u) * 4.4); line-height: var(--line); text-align: right;
-  margin: var(--line) 0 0; color: var(--deep);
-}
-.letter .sign, .letter .btn.next { opacity: 0; transition: opacity 1s; }
-.letter .sign.visible, .letter .btn.next.visible { opacity: 1; }
-.letter .btn.next {
-  display: block; margin: var(--line) auto 0; background: #6fe39a;
-  font-size: calc(var(--u) * 3.8); padding: .25em 1em; border-width: 3px; border-radius: 8px; box-shadow: 3px 3px 0 var(--ink);
+function confetti(count = 40, icons = ["🍢", "🎉", "💙", "🐾", "✨"]) {
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement("span");
+    c.className = "confetti";
+    c.textContent = icons[Math.floor(Math.random() * icons.length)];
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.animationDuration = 2.5 + Math.random() * 3 + "s";
+    c.style.animationDelay = Math.random() * 1.4 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 8000);
+  }
 }
 
-/* Snoopy stickers around the letter */
-.sticker {
-  position: absolute; z-index: 3; height: auto; pointer-events: none;
-  opacity: 0; transform: rotate(var(--r, 0deg)) scale(0);
-  filter: drop-shadow(2px 3px 0 rgba(17,17,17,.28));
+function typeText(text) {
+  const body = $("letterBody"), sign = $("letterSign"), next = $("nextBtn");
+  const holder = $("letterHolder");
+  holder.classList.remove("decor");
+  clearInterval(typingTimer);
+  body.textContent = "";
+  body.classList.remove("done");
+  sign.classList.remove("visible");
+  next.classList.remove("visible");
+  let i = 0;
+  typingTimer = setInterval(() => {
+    body.textContent += text[i++];
+    if (i >= text.length) {
+      clearInterval(typingTimer);
+      body.classList.add("done");
+      sign.classList.add("visible");
+      next.classList.add("visible");
+      holder.classList.add("decor");      // stickers pop in around the letter
+    }
+  }, 35);
 }
-.s-star    { left: -5%;  top: -7%;    width: 25%; --r: -12deg; }
-.s-kiss    { left: -5%;  top: 41%;    width: 19%; --r: -4deg; }
-.s-flowers { right: -5%; top: 36%;    width: 17%; --r: 5deg; }
-.s-tulips  { right: -5%; bottom: -5%; width: 27%; --r: 6deg; }
 
-.letter-holder.decor .sticker {
-  animation:
-    stickerin .7s var(--d) cubic-bezier(.2,1.7,.4,1) both,
-    stickerbob 3.2s calc(var(--d) + .9s) ease-in-out infinite;
-}
-@keyframes stickerin {
-  from { opacity: 0; transform: rotate(var(--r)) scale(0); }
-  to   { opacity: 1; transform: rotate(var(--r)) scale(1); }
-}
-@keyframes stickerbob {
-  0%,100% { opacity: 1; transform: rotate(var(--r)) translateY(0); }
-  50%     { opacity: 1; transform: rotate(var(--r)) translateY(-5px); }
-}
-.letter-wrap.leave .sticker { animation: none; opacity: 0; transition: opacity .3s; }
+/* ---------- 3) Yes -> HELL YEAHHH -> blue bouquet + closed letter ---------- */
+const scene = $("bouquetScene");
+yesBtn.addEventListener("click", () => {
+  yesBtn.disabled = true;
+  card.classList.add("leave");
+  const cheer = $("cheer");
+  setTimeout(() => {
+    stage.classList.add("done");
+    cheer.classList.add("show");
+    cheer.setAttribute("aria-hidden", "false");
+    floatHearts();
+  }, 350);
 
-/* ---------- Date pages ---------- */
-.page {
-  position: fixed; inset: 0; z-index: 9; padding: 20px;
-  display: flex; align-items: center; justify-content: center;
-}
-.page .panel { animation: pagein .6s cubic-bezier(.2,1.3,.4,1) both; }
-@keyframes pagein { from { opacity: 0; transform: scale(.6) rotate(6deg); } to { opacity: 1; transform: rotate(-1.5deg); } }
+  setTimeout(() => {
+    cheer.classList.add("fade");
+    scene.hidden = false;
+    void scene.offsetWidth;
+    scene.classList.add("show");
+    setTimeout(() => $("mail").focus(), 1900);
+  }, 3900);
+});
 
-.date-panel { width: min(400px, 100%); }
-.options { display: flex; flex-direction: column; gap: 12px; width: 100%; margin: 8px 0 6px; }
-.opt {
-  font: inherit; font-size: 1.5rem; cursor: pointer; width: 100%;
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-align: left;
-  background: #fff; color: var(--ink);
-  border: 4px solid var(--ink); border-radius: 10px; box-shadow: 4px 4px 0 var(--ink);
-  transition: transform .15s, box-shadow .15s, background .15s;
-}
-.opt span { font-size: 1.8rem; }
-.opt:hover { background: #e3f2ff; }
-.opt[aria-pressed="true"] { background: var(--btn); transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
-.opt[aria-pressed="true"]::after { content: "✔"; margin-left: auto; color: var(--deep); font-size: 1.6rem; }
-.btn.confirm { margin-top: 6px; background: #6fe39a; }
+/* ---------- 4) Click the letter to open it ---------- */
+$("mail").addEventListener("click", () => {
+  scene.classList.add("leave");
+  setTimeout(() => {
+    scene.hidden = true;
+    const wrap = $("letterWrap");
+    wrap.classList.add("show");
+    wrap.setAttribute("aria-hidden", "false");
+    typeText(LETTER.message);
+  }, 500);
+});
 
-.confirmed-panel { width: min(420px, 100%); gap: 6px; }
-.check {
-  width: 74px; height: 74px; display: grid; place-items: center; font-size: 2.6rem; color: #fff;
-  background: #3cc46a; border: 5px solid var(--ink); border-radius: 50%; box-shadow: 4px 4px 0 var(--ink);
-  animation: pop .6s .3s cubic-bezier(.2,1.8,.4,1) both;
-}
-@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
-.big-title {
-  font-family: "Bangers", "Impact", sans-serif; font-weight: 400; letter-spacing: 2px; line-height: 1;
-  font-size: clamp(2.4rem, 11vw, 3.6rem); margin-top: 8px;
-  color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 4px 4px 0 var(--ink);
-}
-.chosen { font-size: 2rem; color: var(--deep); line-height: 1.1; }
+/* ---------- 5) Next -> Choose a date ---------- */
+let chosenDate = "", chosenEmoji = "";
+$("nextBtn").addEventListener("click", () => {
+  clearInterval(typingTimer);
+  const wrap = $("letterWrap");
+  wrap.classList.remove("show");
+  wrap.classList.add("leave");
+  setTimeout(() => {
+    wrap.style.display = "none";
+    $("datePage").hidden = false;
+  }, 450);
+});
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-}
+const opts = document.querySelectorAll(".opt");
+opts.forEach((o) => {
+  o.addEventListener("click", () => {
+    opts.forEach((x) => x.setAttribute("aria-pressed", "false"));
+    o.setAttribute("aria-pressed", "true");
+    chosenDate = o.dataset.date;
+    chosenEmoji = o.dataset.emoji;
+    $("confirmBtn").disabled = false;
+  });
+});
+
+/* ---------- 6) Confirm -> Date confirmed ---------- */
+$("confirmBtn").addEventListener("click", () => {
+  if (!chosenDate) return;
+  $("datePage").hidden = true;
+  $("chosen").textContent = chosenEmoji + " " + chosenDate;
+  $("confirmPage").hidden = false;
+  confetti(50, ["💙", "🎉", "✨", "🌸", chosenEmoji]);
+});
