@@ -1,103 +1,98 @@
 // ====== EDIT YOUR LETTER HERE ======
 const LETTER = {
-  secretName: "llyod",   // the only name that opens the letter (not case-sensitive)
-  to: "Llyod",           // how the name is displayed on the letter
-  from: "Juan",          // your name, shown as the sender
+  to: "You",
+  from: "Me",
   message:
-`Happiness is a warm blanket, a quiet afternoon,
-and getting to share both with you.
+`Okay, real talk.
 
-Thank you for the little moments, the big laughs,
-and for making every ordinary day feel like a good one.
+I've been craving kwek kwek all week
+and the only thing that would make it better
+is eating it with you.
 
-I hope this letter makes you smile, even a little.`
+My treat. Sauce is on me.
+Sweet, spicy, or both. We'll fight about it there.
+
+See you soon!`
 };
 // ===================================
 
 const $ = (id) => document.getElementById(id);
-const nameScreen = $("nameScreen"), cover = $("cover"), seal = $("seal"), wrap = $("letterWrap");
+const env = $("env"), card = $("card"), stage = $("stage");
+const yesBtn = $("yesBtn"), noBtn = $("noBtn");
 let typingTimer = null;
 
-// Fill in the text
-$("recipient").textContent = LETTER.to;
-$("sender").textContent = "with love, " + LETTER.from;
-$("letterTo").textContent = "Dear " + LETTER.to + ",";
-$("letterSign").textContent = "With love, " + LETTER.from;
+$("letterTo").textContent = "Hey " + LETTER.to + ",";
+$("letterSign").textContent = "- " + LETTER.from;
 
-// Step 1: check the name
-const form = $("nameForm"), input = $("nameInput"), error = $("nameError");
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const typed = input.value.trim().toLowerCase();
-  if (typed === LETTER.secretName.toLowerCase()) {
-    error.textContent = "";
-    nameScreen.classList.add("hide");
-    nameScreen.setAttribute("aria-hidden", "true");
-    cover.classList.remove("hide");
-    cover.setAttribute("aria-hidden", "false");
-    setTimeout(() => seal.focus(), 300);
-  } else {
-    error.textContent = "That's not the right name. Try again.";
-    form.classList.remove("shake");
-    void form.offsetWidth;            // restart the shake animation
-    form.classList.add("shake");
-    input.select();
-  }
+// 1) Click the envelope: flap opens, card rises out, envelope fades away
+function openEnvelope() {
+  env.classList.add("open");
+  $("hint").classList.add("hide");
+  setTimeout(() => env.classList.add("rise"), 450);
+  setTimeout(() => env.classList.add("out"), 1500);
+}
+$("envOpen").addEventListener("click", openEnvelope);
+
+// 2) "No" disappears, only "Yes" stays
+noBtn.addEventListener("click", () => {
+  noBtn.classList.add("gone");
+  yesBtn.classList.add("big");
+  setTimeout(() => noBtn.remove(), 450);
+  yesBtn.focus();
 });
-setTimeout(() => input.focus(), 200);
 
-// Falling hearts, bones and paws
-function petals(count = 22) {
-  const icons = ["💙", "🦴", "💙", "🐾"];
+// 3) "Yes" -> HELL YEAHHH + confetti -> letter pops out
+function confetti(count = 40) {
+  const icons = ["🍢", "🎉", "💙", "🐾", "✨"];
   for (let i = 0; i < count; i++) {
-    const p = document.createElement("span");
-    p.className = "heart";
-    p.textContent = icons[Math.floor(Math.random() * icons.length)];
-    p.style.left = Math.random() * 100 + "vw";
-    p.style.animationDuration = 3 + Math.random() * 3 + "s";
-    p.style.animationDelay = Math.random() * 1.2 + "s";
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 8000);
+    const c = document.createElement("span");
+    c.className = "confetti";
+    c.textContent = icons[Math.floor(Math.random() * icons.length)];
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.animationDuration = 2.5 + Math.random() * 3 + "s";
+    c.style.animationDelay = Math.random() * 1.4 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 8000);
   }
 }
 
-// Typewriter effect
 function typeText(text) {
-  const body = $("letterBody"), signRow = document.querySelector(".sign-row");
+  const body = $("letterBody"), sign = $("letterSign");
   clearInterval(typingTimer);
   body.textContent = "";
   body.classList.remove("done");
-  signRow.classList.remove("visible");
+  sign.classList.remove("visible");
   let i = 0;
   typingTimer = setInterval(() => {
     body.textContent += text[i++];
     if (i >= text.length) {
       clearInterval(typingTimer);
       body.classList.add("done");
-      signRow.classList.add("visible");
+      sign.classList.add("visible");
     }
   }, 35);
 }
 
-function openLetter() {
-  seal.classList.add("cracked");
-  petals();
+yesBtn.addEventListener("click", () => {
+  yesBtn.disabled = true;
+  card.classList.add("leave");
+  const cheer = $("cheer");
   setTimeout(() => {
-    cover.classList.add("hide");
+    stage.classList.add("done");
+    cheer.classList.add("show");
+    cheer.setAttribute("aria-hidden", "false");
+    confetti();
+  }, 350);
+
+  // after the cheer, the letter pops out
+  setTimeout(() => {
+    cheer.classList.add("fade");
+    const wrap = $("letterWrap");
     wrap.classList.add("show");
     wrap.setAttribute("aria-hidden", "false");
     typeText(LETTER.message);
-  }, 450);
-}
+  }, 2800);
+});
 
-function closeLetter() {
-  wrap.classList.remove("show");
-  wrap.setAttribute("aria-hidden", "true");
-  cover.classList.remove("hide");
-  seal.classList.remove("cracked");
-  clearInterval(typingTimer);
-}
-
-seal.addEventListener("click", openLetter);
-$("openBtn").addEventListener("click", openLetter);
-$("closeBtn").addEventListener("click", closeLetter);
+// Start over
+$("againBtn").addEventListener("click", () => location.reload());
