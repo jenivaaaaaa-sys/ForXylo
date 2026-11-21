@@ -1,227 +1,209 @@
-:root {
-  --sky-top: #2f86e8;
-  --sky-bottom: #bfe3ff;
-  --ink: #111;
-  --blue: #2f6fd1;
-  --deep: #1b5fc0;
-  --paper: #f1f8ff;
-  --btn: #8fd0ff;
-  --w: min(320px, 82vw);
+// ====== EDIT YOUR LETTER HERE ======
+const LETTER = {
+  to: "You",
+  from: "Me",
+  message:
+`Okay, real talk.
+
+I've been craving kwek kwek all week
+and the only thing that would make it better
+is eating it with you.
+
+My treat. Sauce is on me.
+Sweet, spicy, or both. We'll fight about it there.
+
+See you soon!`
+};
+// ===================================
+const ACCESS_CODE = "062326";   // the code needed to open the envelope
+// ===================================
+
+const $ = (id) => document.getElementById(id);
+const env = $("env"), card = $("card"), stage = $("stage");
+const yesBtn = $("yesBtn"), noBtn = $("noBtn");
+let typingTimer = null;
+
+$("letterTo").textContent = "Hey " + LETTER.to + ",";
+$("letterSign").textContent = "- " + LETTER.from;
+
+/* ---------- 0) Log in with the numpad ---------- */
+let entered = "";
+const dots = document.querySelectorAll("#dots .dot");
+const codeError = $("codeError");
+let loginOpen = true;
+
+function renderDots() {
+  dots.forEach((d, i) => d.classList.toggle("on", i < entered.length));
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-
-body {
-  font-family: "Patrick Hand", "Comic Sans MS", cursive;
-  color: var(--ink);
-  background:
-    radial-gradient(rgba(255,255,255,.35) 3px, transparent 4px) 0 0 / 46px 46px,
-    linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
-  overflow: hidden;
+function submitCode() {
+  if (entered.length < ACCESS_CODE.length) {
+    codeError.textContent = "Enter all 6 digits.";
+    return;
+  }
+  if (entered === ACCESS_CODE) {
+    codeError.textContent = "";
+    loginOpen = false;
+    $("login").classList.add("hide");
+    setTimeout(() => {
+      $("login").style.display = "none";
+      stage.classList.remove("locked");
+      $("envOpen").focus();
+    }, 500);
+  } else {
+    codeError.textContent = "Wrong code. Try again.";
+    const panel = $("loginPanel");
+    panel.classList.remove("shake");
+    void panel.offsetWidth;          // restart the shake animation
+    panel.classList.add("shake");
+    entered = "";
+    renderDots();
+  }
 }
 
-/* ---------- Background ---------- */
-.sky { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
-.cloud { position: absolute; width: 170px; fill: #fff; stroke: var(--ink); stroke-width: 3; animation: drift linear infinite; }
-.c1 { top: 8%;  animation-duration: 60s;  animation-delay: -10s; }
-.c2 { top: 24%; width: 120px; animation-duration: 80s; animation-delay: -40s; }
-.c3 { top: 14%; width: 210px; animation-duration: 100s; animation-delay: -70s; }
-@keyframes drift { from { left: -240px; } to { left: 110vw; } }
-
-.hill {
-  position: fixed; left: -10%; right: -10%; bottom: -55%; height: 70%;
-  background: #5aa9f0; border: 5px solid var(--ink); border-radius: 50% 50% 0 0;
-  pointer-events: none;
+function pressKey(k) {
+  if (!loginOpen) return;
+  if (k === "back") {
+    entered = entered.slice(0, -1);
+    codeError.textContent = "";
+  } else if (k === "ok") {
+    submitCode();
+    return;
+  } else if (entered.length < ACCESS_CODE.length) {
+    entered += k;
+    codeError.textContent = "";
+  }
+  renderDots();
+  if (entered.length === ACCESS_CODE.length) setTimeout(submitCode, 150);
 }
 
-/* ---------- Stage & envelope ---------- */
-.stage {
-  position: relative; z-index: 2; min-height: 100%;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
-  padding: 20px; transition: opacity .5s ease, transform .5s ease;
-}
-.stage.done { opacity: 0; transform: scale(.9); pointer-events: none; }
+$("numpad").addEventListener("click", (e) => {
+  const btn = e.target.closest(".key");
+  if (btn) pressKey(btn.dataset.key);
+});
+// Keyboard support too
+document.addEventListener("keydown", (e) => {
+  if (!loginOpen) return;
+  if (/^[0-9]$/.test(e.key)) pressKey(e.key);
+  else if (e.key === "Backspace") pressKey("back");
+  else if (e.key === "Enter") pressKey("ok");
+});
 
-.env {
-  position: relative;
-  width: var(--w); height: calc(var(--w) * .6625);
-  perspective: 900px;
-  filter: drop-shadow(8px 8px 0 rgba(17,17,17,.9));
-  transition: transform .4s;
-  animation: wobble 2.6s ease-in-out infinite;
+/* ---------- 1) Click the envelope ---------- */
+function openEnvelope() {
+  env.classList.add("open");
+  $("hint").classList.add("hide");
+  setTimeout(() => env.classList.add("rise"), 450);
+  setTimeout(() => env.classList.add("out"), 1500);
 }
-.env.open { animation: none; filter: none; }
-@keyframes wobble { 0%,100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg) translateY(-6px); } }
+$("envOpen").addEventListener("click", openEnvelope);
 
-.env-part { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity .6s ease; pointer-events: none; }
-.env-back  { z-index: 1; }
-.env-front { z-index: 3; }
-.env-flap  {
-  z-index: 4; transform-origin: top center;
-  transition: transform .6s ease, z-index 0s .3s, opacity .6s ease;
-}
-.env.open .env-flap { transform: rotateX(180deg); z-index: 1; }
+/* ---------- 2) "No" disappears, "no choice ka" appears ---------- */
+noBtn.addEventListener("click", () => {
+  $("noChoice").textContent = "no choice ka";
+  $("noChoice").classList.add("show");
+  noBtn.classList.add("gone");
+  yesBtn.classList.add("big");
+  setTimeout(() => noBtn.remove(), 450);
+  yesBtn.focus();
+});
 
-/* Click target with seal */
-.env-open {
-  position: absolute; inset: 0; z-index: 6; background: none; border: 0; cursor: pointer;
-}
-.env-seal {
-  position: absolute; left: 50%; top: 48%; width: 22%; aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  background: var(--blue); border: 5px solid var(--ink); border-radius: 50%;
-  display: grid; place-items: center; box-shadow: 3px 3px 0 var(--ink);
-  transition: opacity .3s, transform .3s;
-}
-.env-seal svg { width: 70%; }
-.env-open:hover .env-seal { transform: translate(-50%, -50%) scale(1.1); }
-.env-open:focus-visible { outline: 4px solid #fff; outline-offset: 6px; border-radius: 8px; }
-.env.open .env-open { pointer-events: none; }
-.env.open .env-seal { opacity: 0; }
-
-.hint { font-size: 1.5rem; color: #fff; text-shadow: 2px 2px 0 var(--ink); animation: bob 1.6s ease-in-out infinite; transition: opacity .3s; }
-.hint.hide { opacity: 0; }
-@keyframes bob { 50% { transform: translateY(5px); } }
-
-/* ---------- Card ---------- */
-.card {
-  position: absolute; z-index: 2; left: 5%; top: 4%; width: 90%; height: 86%;
-  background: var(--paper); border: 5px solid var(--ink); border-radius: 8px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  text-align: center; padding: 8px;
-  transition: transform .8s cubic-bezier(.2,.9,.3,1.1), opacity .4s ease;
-  pointer-events: none;
-}
-.card-emoji { font-size: 1.7rem; line-height: 1; }
-.card h1 { font-size: clamp(1.7rem, 7vw, 2.1rem); font-weight: 400; line-height: 1; }
-.choices { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 6px; min-height: 52px; }
-
-.env.rise .card { transform: translateY(-62%); }
-.env.out .card { transform: translateY(8%) scale(1.22); pointer-events: auto; box-shadow: 6px 6px 0 var(--ink); }
-.env.out .env-back, .env.out .env-front, .env.out .env-flap { opacity: 0; }
-.card.leave { transform: translateY(8%) scale(0) rotate(12deg) !important; opacity: 0; }
-
-/* ---------- Buttons ---------- */
-.btn {
-  font: inherit; font-size: 1.4rem; cursor: pointer;
-  padding: 6px 22px; border-radius: 8px;
-  border: 4px solid var(--ink); background: var(--btn); color: var(--ink);
-  box-shadow: 4px 4px 0 var(--ink);
-  transition: transform .2s, box-shadow .15s;
-}
-.btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
-.btn:focus-visible { outline: 4px solid var(--deep); outline-offset: 3px; }
-.btn.yes { background: #6fe39a; }
-.btn.no  { background: #fff; }
-.btn.no.gone { animation: vanish .45s forwards; }
-.btn.yes.big { animation: grow .5s forwards, pulse 1.2s .5s ease-in-out infinite; }
-@keyframes vanish { to { transform: scale(0) rotate(-40deg); opacity: 0; } }
-@keyframes grow { to { transform: scale(1.35); } }
-@keyframes pulse { 0%,100% { transform: scale(1.35); } 50% { transform: scale(1.5); } }
-
-/* ---------- HELL YEAHHH ---------- */
-.cheer {
-  position: fixed; inset: 0; z-index: 5; display: grid; place-items: center;
-  pointer-events: none; opacity: 0; transition: opacity .3s;
-}
-.cheer.show { opacity: 1; }
-.cheer.show h2 { animation: slam .7s cubic-bezier(.2,1.6,.4,1) forwards; }
-.cheer.show .burst { animation: spin 6s linear infinite, slam .6s ease-out forwards; }
-.cheer.fade { opacity: 0; transition: opacity .5s; }
-.cheer h2 {
-  position: relative; font-family: "Bangers", "Impact", sans-serif; font-weight: 400;
-  font-size: clamp(3rem, 15vw, 8rem); letter-spacing: 3px; text-align: center; line-height: .95;
-  color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill;
-  text-shadow: 6px 6px 0 var(--ink); transform: scale(0) rotate(-8deg); padding: 0 12px;
-}
-.burst {
-  position: absolute; width: min(110vw, 760px); aspect-ratio: 1; background: #ffd84d;
-  clip-path: polygon(50% 0, 58% 18%, 75% 6%, 76% 26%, 96% 22%, 86% 40%, 100% 50%, 86% 60%, 96% 78%, 76% 74%, 75% 94%, 58% 82%, 50% 100%, 42% 82%, 25% 94%, 24% 74%, 4% 78%, 14% 60%, 0 50%, 14% 40%, 4% 22%, 24% 26%, 25% 6%, 42% 18%);
-  opacity: .95; transform: scale(0);
-}
-@keyframes slam { to { transform: scale(1) rotate(-4deg); } }
-.cheer.show .burst { animation: slamb .6s ease-out forwards, spin 8s .6s linear infinite; }
-@keyframes slamb { to { transform: scale(1); } }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Confetti */
-.confetti { position: fixed; top: -40px; z-index: 6; pointer-events: none; font-size: 26px; animation: fall linear forwards; }
-@keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
-
-/* ---------- Letter ---------- */
-.letter-wrap {
-  position: fixed; inset: 0; z-index: 7; padding: 20px;
-  display: flex; align-items: center; justify-content: center; pointer-events: none;
-}
-.letter {
-  width: min(540px, 100%); max-height: 88vh; overflow-y: auto;
-  background: var(--paper); border: 6px solid var(--ink); border-radius: 6px;
-  box-shadow: 10px 10px 0 var(--ink); padding: 34px 30px 28px;
-  background-image: repeating-linear-gradient(transparent 0 33px, rgba(47,134,232,.3) 33px 34px);
-  transform: scale(0) rotate(-12deg); opacity: 0;
-}
-.letter-wrap.show { pointer-events: auto; }
-.letter-wrap.show .letter { animation: popout .8s cubic-bezier(.2,1.5,.4,1) forwards; }
-@keyframes popout { 60% { opacity: 1; } to { transform: scale(1) rotate(-.6deg); opacity: 1; } }
-
-.letter .to { font-size: 1.9rem; margin-bottom: 12px; }
-.letter .body {
-  font-family: "Special Elite", "Courier New", monospace;
-  font-size: 1.1rem; line-height: 34px; white-space: pre-wrap; min-height: 140px;
-}
-.body::after { content: "▍"; animation: blink 1s steps(1) infinite; }
-.body.done::after { content: ""; }
-@keyframes blink { 50% { opacity: 0; } }
-.letter .sign { font-size: 1.8rem; text-align: right; margin: 18px 0; color: var(--deep); opacity: 0; transition: opacity 1s; }
-.letter .sign.visible { opacity: 1; }
-.btn.again { display: block; margin: 0 auto; background: #cfe9ff; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+/* ---------- helpers ---------- */
+function confetti(count = 40, icons = ["🍢", "🎉", "💙", "🐾", "✨"]) {
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement("span");
+    c.className = "confetti";
+    c.textContent = icons[Math.floor(Math.random() * icons.length)];
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.animationDuration = 2.5 + Math.random() * 3 + "s";
+    c.style.animationDelay = Math.random() * 1.4 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 8000);
+  }
 }
 
-/* ---------- Log in ---------- */
-.login {
-  position: relative; z-index: 3; min-height: 100%;
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-  transition: opacity .5s ease, transform .5s ease;
-}
-.login.hide { opacity: 0; transform: scale(.92) rotate(-2deg); pointer-events: none; }
-.stage.locked { display: none; }
-
-.panel {
-  width: min(400px, 100%);
-  background: var(--paper);
-  background-image: linear-gradient(#cfe9ff 0 14px, transparent 14px);
-  border: 6px solid var(--ink); border-radius: 10px;
-  box-shadow: 8px 8px 0 var(--ink);
-  padding: 30px 24px 26px;
-  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
-  transform: rotate(-1.5deg);
-}
-.panel .small { font-size: 1.4rem; }
-.panel .ask { font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 400; line-height: 1.05; }
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-#codeInput {
-  width: 100%; font: inherit; font-size: 1.6rem; text-align: center; letter-spacing: .35em;
-  padding: 10px 14px; margin-top: 6px;
-  border: 4px solid var(--ink); border-radius: 8px; background: #fff; color: var(--ink);
-  box-shadow: inset 3px 3px 0 #cfe9ff;
-}
-#codeInput::placeholder { color: #7ba7d6; letter-spacing: normal; font-size: 1.3rem; }
-#codeInput:focus { outline: 4px solid var(--deep); outline-offset: 3px; }
-.error { min-height: 1.4em; color: #c0252f; font-size: 1.2rem; }
-.panel.shake { animation: shake .4s; }
-@keyframes shake {
-  20%,60% { transform: rotate(-1.5deg) translateX(-8px); }
-  40%,80% { transform: rotate(-1.5deg) translateX(8px); }
+function typeText(text) {
+  const body = $("letterBody"), sign = $("letterSign"), next = $("nextBtn");
+  clearInterval(typingTimer);
+  body.textContent = "";
+  body.classList.remove("done");
+  sign.classList.remove("visible");
+  next.classList.remove("visible");
+  let i = 0;
+  typingTimer = setInterval(() => {
+    body.textContent += text[i++];
+    if (i >= text.length) {
+      clearInterval(typingTimer);
+      body.classList.add("done");
+      sign.classList.add("visible");
+      next.classList.add("visible");
+    }
+  }, 35);
 }
 
-/* "no choice ka" message under the buttons */
-.nochoice {
-  min-height: 1.2em; font-size: 1.15rem; color: #c0252f; line-height: 1;
-  opacity: 0; transform: translateY(-4px);
-  transition: opacity .3s, transform .3s;
-}
-.nochoice.show { opacity: 1; transform: none; }
+/* ---------- 3) Yes -> HELL YEAHHH -> blue bouquet + closed letter ---------- */
+const scene = $("bouquetScene");
+yesBtn.addEventListener("click", () => {
+  yesBtn.disabled = true;
+  card.classList.add("leave");
+  const cheer = $("cheer");
+  setTimeout(() => {
+    stage.classList.add("done");
+    cheer.classList.add("show");
+    cheer.setAttribute("aria-hidden", "false");
+    confetti();
+  }, 350);
+
+  setTimeout(() => {
+    cheer.classList.add("fade");
+    scene.hidden = false;
+    void scene.offsetWidth;
+    scene.classList.add("show");
+    setTimeout(() => $("mail").focus(), 1900);
+  }, 2800);
+});
+
+/* ---------- 4) Click the letter to open it ---------- */
+$("mail").addEventListener("click", () => {
+  scene.classList.add("leave");
+  setTimeout(() => {
+    scene.hidden = true;
+    const wrap = $("letterWrap");
+    wrap.classList.add("show");
+    wrap.setAttribute("aria-hidden", "false");
+    typeText(LETTER.message);
+  }, 500);
+});
+
+/* ---------- 5) Next -> Choose a date ---------- */
+let chosenDate = "", chosenEmoji = "";
+$("nextBtn").addEventListener("click", () => {
+  clearInterval(typingTimer);
+  const wrap = $("letterWrap");
+  wrap.classList.remove("show");
+  wrap.classList.add("leave");
+  setTimeout(() => {
+    wrap.style.display = "none";
+    $("datePage").hidden = false;
+  }, 450);
+});
+
+const opts = document.querySelectorAll(".opt");
+opts.forEach((o) => {
+  o.addEventListener("click", () => {
+    opts.forEach((x) => x.setAttribute("aria-pressed", "false"));
+    o.setAttribute("aria-pressed", "true");
+    chosenDate = o.dataset.date;
+    chosenEmoji = o.dataset.emoji;
+    $("confirmBtn").disabled = false;
+  });
+});
+
+/* ---------- 6) Confirm -> Date confirmed ---------- */
+$("confirmBtn").addEventListener("click", () => {
+  if (!chosenDate) return;
+  $("datePage").hidden = true;
+  $("chosen").textContent = chosenEmoji + " " + chosenDate;
+  $("confirmPage").hidden = false;
+  confetti(50, ["💙", "🎉", "✨", "🌸", chosenEmoji]);
+});
