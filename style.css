@@ -16,7 +16,7 @@ html, body { height: 100%; }
 body {
   font-family: "Patrick Hand", "Comic Sans MS", cursive;
   color: var(--ink);
-  background: #c8e6f8 url("bg-clouds.jpg") repeat 0 0 / 1000px auto;
+  background: #c8e6f8 url("design/cloudy-sky-tile.jpg") repeat 0 0 / 1000px auto;
   animation: skydrift 90s linear infinite;
   overflow: hidden;
 }
@@ -270,36 +270,52 @@ body {
 .bouquet-scene.show .hint { animation: fadein .5s 2s forwards, bob 1.6s 2.5s ease-in-out infinite; }
 @keyframes fadein { to { opacity: 1; } }
 
-/* ---------- Letter ---------- */
+/* ---------- Letter (uses design/letter-paper.jpg) ---------- */
 .letter-wrap {
-  position: fixed; inset: 0; z-index: 8; padding: 20px;
+  position: fixed; inset: 0; z-index: 8; padding: 12px;
   display: flex; align-items: center; justify-content: center; pointer-events: none;
 }
 .letter {
-  width: min(540px, 100%); max-height: 88vh; overflow-y: auto;
-  background: var(--paper); border: 6px solid var(--ink); border-radius: 6px;
-  box-shadow: 10px 10px 0 var(--ink); padding: 34px 30px 28px;
-  background-image: repeating-linear-gradient(transparent 0 33px, rgba(47,134,232,.3) 33px 34px);
+  /* --u = 1% of the letter's width, so text scales with the paper */
+  --lw: min(94vw, 560px, calc(88vh * 0.6964));
+  --u: calc(var(--lw) / 100);
+  --line: calc(var(--u) * 4.173);          /* distance between the ruled lines */
+
+  width: var(--lw); aspect-ratio: 1124 / 1614;
+  background: #fff url("design/letter-paper.jpg") center / 100% 100% no-repeat;
+  border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.4);
+  /* keep the writing inside the ruled area of the picture */
+  padding: calc(var(--u) * 16) calc(var(--u) * 16.6) calc(var(--u) * 14) calc(var(--u) * 14.4);
+  overflow-y: auto; scrollbar-width: none;
+  color: #1c2a4a;
   transform: scale(0) rotate(-12deg); opacity: 0;
 }
+.letter::-webkit-scrollbar { display: none; }
 .letter-wrap.show { pointer-events: auto; }
 .letter-wrap.show .letter { animation: popout .8s cubic-bezier(.2,1.5,.4,1) forwards; }
 .letter-wrap.leave .letter { animation: letterout .45s ease-in forwards; }
 @keyframes popout { 60% { opacity: 1; } to { transform: scale(1) rotate(-.6deg); opacity: 1; } }
 @keyframes letterout { from { transform: scale(1); opacity: 1; } to { transform: scale(.7) translateY(-60px); opacity: 0; } }
 
-.letter .to { font-size: 1.9rem; margin-bottom: 12px; }
+.letter .to { font-size: calc(var(--u) * 4.6); line-height: var(--line); }
 .letter .body {
   font-family: "Special Elite", "Courier New", monospace;
-  font-size: 1.1rem; line-height: 34px; white-space: pre-wrap; min-height: 140px;
+  font-size: calc(var(--u) * 3.3); line-height: var(--line);
+  white-space: pre-wrap; min-height: calc(var(--line) * 10);
 }
 .body::after { content: "▍"; animation: blink 1s steps(1) infinite; }
 .body.done::after { content: ""; }
 @keyframes blink { 50% { opacity: 0; } }
-.letter .sign { font-size: 1.8rem; text-align: right; margin: 18px 0 0; color: var(--deep); }
+.letter .sign {
+  font-size: calc(var(--u) * 4.4); line-height: var(--line); text-align: right;
+  margin: var(--line) 0 0; color: var(--deep);
+}
 .letter .sign, .letter .btn.next { opacity: 0; transition: opacity 1s; }
 .letter .sign.visible, .letter .btn.next.visible { opacity: 1; }
-.btn.next { display: block; margin: 16px auto 0; background: #6fe39a; }
+.letter .btn.next {
+  display: block; margin: var(--line) auto 0; background: #6fe39a;
+  font-size: calc(var(--u) * 3.8); padding: .25em 1em; border-width: 3px; border-radius: 8px; box-shadow: 3px 3px 0 var(--ink);
+}
 
 /* ---------- Date pages ---------- */
 .page {
