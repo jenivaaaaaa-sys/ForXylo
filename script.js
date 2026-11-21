@@ -1,7 +1,7 @@
 // ====== EDIT YOUR LETTER HERE ======
 const LETTER = {
-  to: "You",
-  from: "Me",
+  to: "myOneandOnly",
+  from: "Jenibabes",
   message:
 `Okay, real talk.
 
