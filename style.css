@@ -180,3 +180,48 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- Log in ---------- */
+.login {
+  position: relative; z-index: 3; min-height: 100%;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  transition: opacity .5s ease, transform .5s ease;
+}
+.login.hide { opacity: 0; transform: scale(.92) rotate(-2deg); pointer-events: none; }
+.stage.locked { display: none; }
+
+.panel {
+  width: min(400px, 100%);
+  background: var(--paper);
+  background-image: linear-gradient(#cfe9ff 0 14px, transparent 14px);
+  border: 6px solid var(--ink); border-radius: 10px;
+  box-shadow: 8px 8px 0 var(--ink);
+  padding: 30px 24px 26px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  transform: rotate(-1.5deg);
+}
+.panel .small { font-size: 1.4rem; }
+.panel .ask { font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 400; line-height: 1.05; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+#codeInput {
+  width: 100%; font: inherit; font-size: 1.6rem; text-align: center; letter-spacing: .35em;
+  padding: 10px 14px; margin-top: 6px;
+  border: 4px solid var(--ink); border-radius: 8px; background: #fff; color: var(--ink);
+  box-shadow: inset 3px 3px 0 #cfe9ff;
+}
+#codeInput::placeholder { color: #7ba7d6; letter-spacing: normal; font-size: 1.3rem; }
+#codeInput:focus { outline: 4px solid var(--deep); outline-offset: 3px; }
+.error { min-height: 1.4em; color: #c0252f; font-size: 1.2rem; }
+.panel.shake { animation: shake .4s; }
+@keyframes shake {
+  20%,60% { transform: rotate(-1.5deg) translateX(-8px); }
+  40%,80% { transform: rotate(-1.5deg) translateX(8px); }
+}
+
+/* "no choice ka" message under the buttons */
+.nochoice {
+  min-height: 1.2em; font-size: 1.15rem; color: #c0252f; line-height: 1;
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity .3s, transform .3s;
+}
+.nochoice.show { opacity: 1; transform: none; }
