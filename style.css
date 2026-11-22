@@ -226,7 +226,7 @@ body {
 
 .cheer h2 {
   position: relative; font-family: "Fredoka", "Patrick Hand", sans-serif; font-weight: 600;
-  font-size: clamp(2.6rem, 13vw, 6.5rem); letter-spacing: 2px; text-align: center; line-height: 1.05;
+  font-size: clamp(2.1rem, 10.5vw, 5rem); letter-spacing: 2px; text-align: center; line-height: 1.08;
   color: #fff; -webkit-text-stroke: 7px #4f7fe8; paint-order: stroke fill;
   text-shadow: 0 7px 0 #2b45a8, 0 0 28px rgba(143,208,255,.7); padding: 0 12px;
 }
@@ -337,10 +337,13 @@ body {
 
 .letter .to { font-size: calc(var(--u) * 4.6); line-height: var(--line); }
 .letter .body {
-  font-family: "Special Elite", "Courier New", monospace;
-  font-size: calc(var(--u) * 3.3); line-height: var(--line);
-  white-space: pre-wrap; min-height: calc(var(--line) * 10);
+  font-family: "Patrick Hand", "Comic Sans MS", cursive;
+  font-size: calc(var(--u) * 3.5); line-height: var(--line);
+  white-space: pre-wrap; min-height: calc(var(--line) * 10); cursor: pointer;
+  transition: opacity .3s ease;
 }
+.letter .body.turning { opacity: 0; }
+.letter .to:empty, .letter .sign:empty { display: none; }
 .body::after { content: "▍"; animation: blink 1s steps(1) infinite; }
 .body.done::after { content: ""; }
 @keyframes blink { 50% { opacity: 0; } }
