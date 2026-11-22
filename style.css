@@ -123,50 +123,66 @@ body {
 .key {
   font-family: "Fredoka", "Patrick Hand", sans-serif; font-weight: 600; font-size: 1.7rem; line-height: 1;
   cursor: pointer; padding: 14px 0; color: #fff;
-  background: #e0272a; border: 3px solid #111; border-radius: 14px; box-shadow: 0 5px 0 #111;
+  background: #2f6fd1; border: 3px solid #111; border-radius: 14px; box-shadow: 0 5px 0 #111;
   text-shadow: 0 2px 0 rgba(0,0,0,.35);
   transition: transform .08s, box-shadow .08s, background .15s;
   -webkit-tap-highlight-color: transparent; touch-action: manipulation;
 }
 .key:hover {
-  background: #f03a3d;
+  background: #4a88ee;
 }
 .key:active {
-  transform: translateY(4px); box-shadow: 0 1px 0 #111; background: #c41d20;
+  transform: translateY(4px); box-shadow: 0 1px 0 #111; background: #1b4fa8;
 }
 .key.small-key {
   font-size: 1.05rem;
 }
-.key[data-key="ok"]   { background: #2f9a2f; }
-.key[data-key="ok"]:hover { background: #3cb03c; }
-.key[data-key="ok"]:active { background: #247a24; }
-.key[data-key="back"] { background: #ffd23f; color: #111; text-shadow: none; }
-.key[data-key="back"]:hover { background: #ffdc66; }
-.key[data-key="back"]:active { background: #e8b91f; }
+.key[data-key="ok"]   { background: #1c46a8; }
+.key[data-key="ok"]:hover { background: #2a5cc8; }
+.key[data-key="ok"]:active { background: #12338a; }
+.key[data-key="back"] { background: #8fd0ff; color: #111; text-shadow: none; }
+.key[data-key="back"]:hover { background: #a9dcff; }
+.key[data-key="back"]:active { background: #6bb8f0; }
 
 
-/* ---- Pictures around the log in page (behind the numpad) ---- */
+/* ---- Pictures that live on the numpad card (log in page) ---- */
 .code-wrap { position: relative; z-index: 1; }
+.pad-wrap { position: relative; width: min(260px, 100%); margin-top: 6px; }
+.pad-wrap .numpad { width: 100%; position: relative; z-index: 1; }
+
 .lg {
-  position: absolute; z-index: 0; height: auto; pointer-events: none;
-  transform: rotate(var(--r, 0deg));
-  filter: drop-shadow(3px 4px 0 rgba(17,17,17,.28));
+  position: absolute; width: var(--w); height: auto; pointer-events: none;
+  transform: rotate(var(--r, 0deg)) scaleX(var(--fx, 1));
+  filter: drop-shadow(3px 4px 0 rgba(17,17,17,.3));
   animation: lgbob 3.6s var(--d, 0s) ease-in-out infinite;
 }
 @keyframes lgbob {
-  0%,100% { transform: rotate(var(--r)) translateY(0); }
-  50%     { transform: rotate(var(--r)) translateY(-8px); }
+  0%,100% { transform: rotate(var(--r)) scaleX(var(--fx, 1)) translateY(0); }
+  50%     { transform: rotate(var(--r)) scaleX(var(--fx, 1)) translateY(-7px); }
 }
-.lg-couple   { left: 2%;  top: 3%;     width: clamp(78px, 17vw, 190px); }
-.lg-balloons { right: 3%; top: 2%;     width: clamp(86px, 18vw, 210px); }
-.lg-letter   { left: 2%;  bottom: 3%;  width: clamp(84px, 17vw, 200px); }
-.lg-pup      { left: 1%;  top: 42%;    width: clamp(52px, 11vw, 130px); }
-.lg-face {
-  right: 2%; top: 40%; width: clamp(58px, 13vw, 150px); aspect-ratio: 1; object-fit: cover;
-  border-radius: 50%; border: 4px solid #fff; box-shadow: 4px 5px 0 #111;
-  filter: none;
+.lg-back  { z-index: 0; }     /* tucked behind the card, peeking out */
+.lg-front { z-index: 2; }
+
+.lg-flower   { right: calc(var(--w) * -0.58); top: 24%;  animation-name: lgpeekR; }
+.lg-pup      { left:  calc(var(--w) * -0.6);  top: 52%;  animation-name: lgpeekL; }
+.lg-couple   { left:  calc(var(--w) * -0.3);  bottom: calc(100% - 12px); }          /* standing on the card's top edge */
+.lg-face     { right: calc(var(--w) * -0.32); top: calc(var(--w) * -0.34); aspect-ratio: 1; object-fit: cover;
+               border-radius: 50%; border: 4px solid #fff; box-shadow: 3px 4px 0 #111; filter: none; }   /* pinned to the corner */
+.lg-balloons { right: calc(var(--w) * -0.85); bottom: -6px; }
+.lg-letter   { left:  calc(var(--w) * -0.85); bottom: -6px; }                      /* mirrored: walks toward the keys */
+
+@keyframes lgpeekR { 0%,100% { transform: rotate(var(--r)) translateX(0); } 50% { transform: rotate(var(--r)) translateX(-7px); } }
+@keyframes lgpeekL { 0%,100% { transform: rotate(var(--r)) translateX(0); } 50% { transform: rotate(var(--r)) translateX(7px); } }
+
+/* little hearts floating around the page */
+.lh {
+  position: absolute; z-index: 0; pointer-events: none; font-size: var(--s); line-height: 1; color: #fff;
+  text-shadow: -1.5px -1.5px 0 #111, 1.5px -1.5px 0 #111, -1.5px 1.5px 0 #111, 1.5px 1.5px 0 #111, 0 3px 0 #111;
+  animation: lhfloat 4s var(--d, 0s) ease-in-out infinite;
 }
-@media (max-height: 560px) { .lg { display: none; } }
+.lh:nth-of-type(even) { color: #ffb3d1; }
+@keyframes lhfloat { 0%,100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-12px) rotate(6deg); } }
+@media (max-height: 560px) { .lg, .lh { display: none; } }
 
 /* ---------- Stage & envelope ---------- */
 .stage {
