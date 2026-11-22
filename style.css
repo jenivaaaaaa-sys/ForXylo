@@ -147,7 +147,7 @@ body {
 
 /* ---- Pictures that live on the numpad card (log in page) ---- */
 .code-wrap { position: relative; z-index: 1; }
-.pad-wrap { position: relative; width: min(260px, 100%); margin-top: 6px; }
+.pad-wrap { position: relative; width: min(260px, 100%); margin-top: clamp(44px, 11vh, 88px); }   /* room above the card for the couple */
 .pad-wrap .numpad { width: 100%; position: relative; z-index: 1; }
 
 .lg {
@@ -163,13 +163,13 @@ body {
 .lg-back  { z-index: 0; }     /* tucked behind the card, peeking out */
 .lg-front { z-index: 2; }
 
-.lg-flower   { right: calc(var(--w) * -0.58); top: 24%;  animation-name: lgpeekR; }
-.lg-pup      { left:  calc(var(--w) * -0.6);  top: 52%;  animation-name: lgpeekL; }
-.lg-couple   { left:  calc(var(--w) * -0.3);  bottom: calc(100% - 12px); }          /* standing on the card's top edge */
-.lg-face     { right: calc(var(--w) * -0.32); top: calc(var(--w) * -0.34); aspect-ratio: 1; object-fit: cover;
+.lg-flower   { right: calc(var(--w) * -0.58); top: 6%;   animation-name: lgpeekR; }
+.lg-pup      { left:  calc(var(--w) * -0.6);  top: 12%;  animation-name: lgpeekL; }
+.lg-couple   { left:  calc(var(--w) * -0.2);  bottom: calc(100% - 10px); }          /* standing on the card's top edge */
+.lg-face     { right: calc(var(--w) * -0.5);  top: calc(var(--w) * -0.5);  aspect-ratio: 1; object-fit: cover;
                border-radius: 50%; border: 4px solid #fff; box-shadow: 3px 4px 0 #111; filter: none; }   /* pinned to the corner */
-.lg-balloons { right: calc(var(--w) * -0.85); bottom: -6px; }
-.lg-letter   { left:  calc(var(--w) * -0.85); bottom: -6px; }                      /* mirrored: walks toward the keys */
+.lg-balloons { right: calc(var(--w) * -0.92); bottom: -6px; }
+.lg-letter   { left:  calc(var(--w) * -0.95); bottom: -6px; }                      /* mirrored: walks toward the keys */
 
 @keyframes lgpeekR { 0%,100% { transform: rotate(var(--r)) translateX(0); } 50% { transform: rotate(var(--r)) translateX(-7px); } }
 @keyframes lgpeekL { 0%,100% { transform: rotate(var(--r)) translateX(0); } 50% { transform: rotate(var(--r)) translateX(7px); } }
