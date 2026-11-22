@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bevan&family=Fredoka:wght@400;600&family=Playfair+Display:wght@700&family=Patrick+Hand&family=Special+Elite&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -69,8 +69,8 @@
       </svg>
 
       <section class="card" id="card" aria-live="polite">
-        <p class="card-emoji" aria-hidden="true">🍢</p>
-        <h1>kwek kwek tayo</h1>
+        <p class="card-emoji" aria-hidden="true">💌</p>
+        <h1>date tayoo?</h1>
         <div class="choices" id="choices">
           <button class="btn yes" id="yesBtn">Yes</button>
           <button class="btn no" id="noBtn">No</button>
@@ -233,15 +233,32 @@
   </section>
 
   <!-- 7. Date confirmed -->
-  <section class="page" id="confirmPage" hidden>
-    <div class="panel confirmed-panel">
-      <p class="check" aria-hidden="true">✔</p>
-      <h2 class="big-title">DATE CONFIRMED</h2>
-      <p class="chosen" id="chosen"></p>
-      <p class="small">See you there 💙</p>
+  <section class="page confirm-page" id="confirmPage" hidden>
+    <button class="sound-btn" id="soundBtn" aria-label="Sound on" title="Sound on/off">&#128266;</button>
+    <div class="confirm-inner">
+      <div class="confirm-heart" aria-hidden="true">
+        <span class="heart-core">&#9829;</span>
+        <span class="spark s1">&#10022;</span><span class="spark s2">&#10022;</span>
+        <span class="spark s3">&#10022;</span><span class="spark s4">&#10022;</span>
+      </div>
+      <p class="confirm-kicker">It's official</p>
+      <h2 class="confirm-title">Date Confirmed</h2>
+
+      <div class="ticket">
+        <div class="ticket-img" id="ticketImg"></div>
+        <div class="ticket-body">
+          <span class="ticket-label">Our date</span>
+          <span class="ticket-name" id="chosen"></span>
+        </div>
+      </div>
+
+      <p class="confirm-note">I can't wait, baby <span aria-hidden="true">&#128153;</span></p>
+
+      <button class="save-btn" id="saveBtn">Save this date <span aria-hidden="true">&#128248;</span></button>
+      <p class="save-status" id="saveStatus" role="status"></p>
     </div>
   </section>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>
