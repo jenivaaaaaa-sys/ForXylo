@@ -1,24 +1,16 @@
 // ====== EDIT YOUR LETTER HERE ======
+// Each item in "pages" is one page of the letter (the letter turns the page when it has more than one).
 const LETTER = {
-  to: "My Ali",
-  from: "Jenibabes",
-  message:
-Hello, my baby!
+  to: "",      // leave empty if your message already starts with a greeting
+  from: "",    // leave empty if your message already ends with a sign-off
+  pages: [
+`Hello, my baby!
+Happy monthsarry!!! Baby, alam ko na ang dami nang nangyayari sa'tin these past few days, and I hope na malagpasan natin 'tooo kasi looking forward ako sa futureee. Future with youuuuuuu! Sana ma-fix natin ang mga upcoming problems and walang hiwalayan kasi I've been through so muchh pain, and nakaya ko siya because of youu and sa mga naturo mo sa'kin.
 
-Happy monthsarry!!! Baby, alam ko na ang dami nang nangyayari sa'tin
-these past few days, and I hope na malagpasan natin 'tooo kasi looking 
-forward ako sa futureee. Future with youuuuuuu!Sana ma-fix natin ang
-mga upcoming problems and walang hiwalayan kasi I've been through so muchh 
-pain, and nakaya ko siya because of youu and sa mga naturo mo sa'kin.
-
-
-I'm so happy to have youu, and sana huwag ito matapos kasi naniniwala ako
-na makakaya natin 'tong lahat kasi strong na tayo. Hindi na tayo
-katulad ng datiii. I love you, baby kooooooo!
-HAPPY MONTHSARRYYY!!! Hihi, date tau!!
-
-
-See you soon!`
+I'm so happy to have youu, and sana huwag ito matapos kasi naniniwala ako na makakaya natin 'tong lahat kasi strong na tayo. Hindi na tayo katulad ng datiii. I love you, baby kooooooo!
+HAPPY MONTHSARRYYY!!! Hihi, date tau!!`,
+`Thank you, thank youu sa mga pagsagot sa'kin sa pagkain at sa ibang bagayyy. So much appreciated, and babawi ako sa'yo, baby. Wait mo lang!! Alam mo 'yan, mahal na mahal kita at wala akong ipagdadamot sa'yo. Hihihiii! Love u so much talaga, ganda! 💗`
+  ]
 };
 // ===================================
 const ACCESS_CODE = "062326";   // the code needed to open the envelope
@@ -29,8 +21,8 @@ const env = $("env"), card = $("card"), stage = $("stage");
 const yesBtn = $("yesBtn"), noBtn = $("noBtn");
 let typingTimer = null;
 
-$("letterTo").textContent = "Hey " + LETTER.to + ",";
-$("letterSign").textContent = "- " + LETTER.from;
+$("letterTo").textContent = LETTER.to ? "Hey " + LETTER.to + "," : "";
+$("letterSign").textContent = LETTER.from ? "- " + LETTER.from : "";
 
 /* ---------- 0) Log in with the numpad ---------- */
 let entered = "";
@@ -232,7 +224,7 @@ function startFireworks() {
   fxResize();
   fx.running = true;
   fx.raf = requestAnimationFrame(fxLoop);
-  [0, 200, 650, 1000, 1350, 1750, 2150, 2500, 2850].forEach((t) => {
+  [0, 200, 650, 1000, 1350, 1750, 2150, 2500, 2850, 3250, 3650].forEach((t) => {
     fx.timers.push(setTimeout(() => { launchRocket(); if (Math.random() < .5) launchRocket(); }, t));
   });
 }
@@ -301,27 +293,54 @@ function confetti(count = 40, icons = ["🍢", "🎉", "💙", "🐾", "✨"]) {
   }
 }
 
-function typeText(text) {
-  const body = $("letterBody"), sign = $("letterSign"), next = $("nextBtn");
-  const holder = $("letterHolder");
-  holder.classList.remove("decor");
+// Types one page of the letter. Tap the paper while it types to show the whole page at once.
+let pageIndex = 0;
+function typeText(text, onDone) {
+  const body = $("letterBody");
   clearInterval(typingTimer);
   body.textContent = "";
-  body.classList.remove("done");
-  sign.classList.remove("visible");
-  next.classList.remove("visible");
+  body.classList.remove("done", "turning");
   let i = 0;
+  const finish = () => {
+    clearInterval(typingTimer);
+    body.textContent = text;
+    body.classList.add("done");
+    body.onclick = null;
+    onDone();
+  };
+  body.onclick = finish;
   typingTimer = setInterval(() => {
-    body.textContent += text[i++];
-    if (i >= text.length) {
-      clearInterval(typingTimer);
-      body.classList.add("done");
-      sign.classList.add("visible");
-      next.classList.add("visible");
-      holder.classList.add("decor");      // stickers pop in around the letter
-    }
-  }, 35);
+    i += 2;                                   // two characters per tick keeps long letters quick
+    body.textContent = text.slice(0, i);
+    if (i >= text.length) finish();
+  }, 22);
 }
+
+function showPage(n) {
+  pageIndex = n;
+  const holder = $("letterHolder"), pageBtn = $("pageBtn"), nextBtn = $("nextBtn"), sign = $("letterSign");
+  const last = n >= LETTER.pages.length - 1;
+  pageBtn.hidden = true; pageBtn.classList.remove("visible");
+  nextBtn.hidden = true; nextBtn.classList.remove("visible");
+  sign.classList.remove("visible");
+  if (n === 0) holder.classList.remove("decor");
+  typeText(LETTER.pages[n], () => {
+    holder.classList.add("decor");            // stickers and photos pop in around the letter
+    if (last) {
+      sign.classList.add("visible");
+      nextBtn.hidden = false; void nextBtn.offsetWidth; nextBtn.classList.add("visible");
+    } else {
+      pageBtn.hidden = false; void pageBtn.offsetWidth; pageBtn.classList.add("visible");
+    }
+  });
+}
+
+$("pageBtn").addEventListener("click", () => {
+  const body = $("letterBody");
+  $("pageBtn").hidden = true;
+  body.classList.add("turning");              // fade the old page, then write the next one
+  setTimeout(() => showPage(pageIndex + 1), 320);
+});
 
 /* ---------- 3) Yes -> HELL YEAHHH -> blue bouquet + closed letter ---------- */
 const scene = $("bouquetScene");
@@ -336,14 +355,14 @@ yesBtn.addEventListener("click", () => {
     celebrate();
   }, 350);
 
-  setTimeout(stopFireworks, 4900);
+  setTimeout(stopFireworks, 5900);
   setTimeout(() => {
     cheer.classList.add("fade");
     scene.hidden = false;
     void scene.offsetWidth;
     scene.classList.add("show");
     setTimeout(() => $("mail").focus(), 1900);
-  }, 3900);
+  }, 4900);
 });
 
 /* ---------- 4) Click the letter to open it ---------- */
@@ -354,7 +373,7 @@ $("mail").addEventListener("click", () => {
     const wrap = $("letterWrap");
     wrap.classList.add("show");
     wrap.setAttribute("aria-hidden", "false");
-    typeText(LETTER.message);
+    showPage(0);
   }, 500);
 });
 
